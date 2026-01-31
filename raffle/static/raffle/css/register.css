@@ -1,0 +1,185 @@
+/* =========================================================
+   REGISTER – Ciudad de la Suerte
+   Layout 2 columnas en pantallas horizontales (PC)
+   1 columna en mobile
+   ========================================================= */
+
+/* CONTENEDOR GENERAL */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    width: 100%;
+    padding: 20px 0;
+    gap: 24px;
+}
+
+/* TÍTULO */
+.form-section .content-title {
+    margin-bottom: 4px;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 0.05em;
+}
+
+/* =========================================================
+   FORMULARIO – GRID RESPONSIVE
+   ========================================================= */
+.form-section form {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Cada bloque de campo (div) sigue siendo columna interna */
+.form-section form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Labels */
+.form-section form label {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+/* Inputs */
+.form-section form input,
+.form-section form select {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 1rem;
+    transition: all 0.25s ease;
+}
+
+.form-section form input:focus,
+.form-section form select:focus {
+    border-color: var(--accent-soft);
+    outline: none;
+    box-shadow: var(--shadow-soft);
+}
+
+/* ERRORES */
+.error {
+    color: #ffb4b4;
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   TÉRMINOS
+   ========================================================= */
+.terms-legend {
+    margin-top: 4px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.terms-legend::-webkit-scrollbar {
+    width: 6px;
+}
+.terms-legend::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+}
+.terms-legend::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+}
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.form-actions .button {
+    width: 100%;
+    padding: 14px 22px;
+    border-radius: 999px;
+    border: 2px solid var(--accent);
+    background: var(--button-bg);
+    color: var(--text-light);
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.25s ease;
+}
+
+.form-actions .button:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   RESPONSIVE: 1 COLUMNA (MOBILE / TABLET)
+   ========================================================= */
+@media (max-width: 899px) {
+    .form-section form {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE: 2 COLUMNAS (PC HORIZONTAL)
+   ========================================================= */
+/*  → Usa el espacio horizontal y hace el formulario más bajo */
+@media (min-width: 900px) and (orientation: landscape) {
+
+    .form-section form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 24px;
+        row-gap: 18px;
+        max-width: 780px;
+    }
+
+    /* Términos y botones → ancho completo */
+    .form-section form .terms-legend,
+    .form-section form .form-actions,
+    .form-section form > .error {
+        grid-column: 1 / -1;
+    }
+
+    /* ⭐ FORM-ACTIONS AHORA VA EN COLUMNA Y ANCHO FULL */
+    .form-actions {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+    }
+
+    /* ⭐ CADA BOTÓN OCUPA EL 100% DEL ANCHO */
+    .form-actions .button {
+        width: 100%;
+        max-width: none;
+    }
+}

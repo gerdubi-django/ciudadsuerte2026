@@ -1,0 +1,77 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+
+{% block page_title %}Configurar terminal | Ciudad de la Suerte{% endblock page_title %}
+{% block header_title %}Configurar terminal{% endblock header_title %}
+{% block header_subtitle %}Define la sala y IP locales para esta terminal.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section admin-section--primary">
+    <header class="admin-section__header">
+        <div>
+            <h2>Configuración local</h2>
+            <p>Establece número de terminal, sala e IP para esta computadora.</p>
+        </div>
+        <div class="admin-chip-group">
+            {% if terminal_config %}
+            <span class="admin-chip">Terminal: {{ terminal_config.terminal_id }}</span>
+            <span class="admin-chip">IP: {{ terminal_config.room_ip }}</span>
+            <span class="admin-chip">Impresora: {{ terminal_config.printer_name }}</span>
+            <span class="admin-chip">Puerto: {{ terminal_config.printer_port }}</span>
+            {% else %}
+            <span class="admin-chip">Sin configuración local</span>
+            {% endif %}
+        </div>
+    </header>
+    <form method="post" class="admin-form" novalidate>
+        {% csrf_token %}
+
+        <div class="admin-form__grid">
+            <div class="admin-field">
+                <label for="{{ form.terminal_id.id_for_label }}">{{ form.terminal_id.label }}</label>
+                {{ form.terminal_id }}
+                {% if form.terminal_id.errors %}
+                <div class="admin-field__error">{{ form.terminal_id.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.room_id.id_for_label }}">{{ form.room_id.label }}</label>
+                {{ form.room_id }}
+                {% if form.room_id.errors %}
+                <div class="admin-field__error">{{ form.room_id.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.room_ip.id_for_label }}">{{ form.room_ip.label }}</label>
+                {{ form.room_ip }}
+                {% if form.room_ip.errors %}
+                <div class="admin-field__error">{{ form.room_ip.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.printer_name.id_for_label }}">{{ form.printer_name.label }}</label>
+                {{ form.printer_name }}
+                {% if form.printer_name.errors %}
+                <div class="admin-field__error">{{ form.printer_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.printer_port.id_for_label }}">{{ form.printer_port.label }}</label>
+                {{ form.printer_port }}
+                {% if form.printer_port.errors %}
+                <div class="admin-field__error">{{ form.printer_port.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="admin-alert admin-alert--error">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="admin-form__actions">
+            <a class="admin-button admin-button--ghost" href="{% url 'raffle:home' %}">Volver</a>
+            <button type="submit" class="admin-button">Guardar configuración</button>
+        </div>
+    </form>
+</section>
+{% endblock content %}

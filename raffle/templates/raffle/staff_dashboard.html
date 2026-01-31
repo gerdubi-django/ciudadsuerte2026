@@ -1,0 +1,70 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+
+{% block page_title %}Reportes de sala | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_room_active %}is-active{% endblock nav_room_active %}
+{% block header_title %}Reportes de sala{% endblock header_title %}
+{% block header_subtitle %}Cupones generados con opción de reimpresión única.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section">
+    <header class="admin-section__header">
+        <div>
+            <h2>Cupones impresos</h2>
+            <p>Use el buscador para filtrar por código, participante o email.</p>
+        </div>
+        <div class="admin-field admin-field--inline">
+            <label for="searchCoupons">Buscar</label>
+            <input id="searchCoupons" class="admin-input" type="text" placeholder="Código, nombre, email o DNI" data-staff-search>
+        </div>
+    </header>
+    <div class="admin-table-wrapper">
+        <table class="admin-table" data-staff-table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Participante</th>
+                    <th>Email</th>
+                    <th>DNI</th>
+                    <th>Teléfono</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr data-code="{{ coupon.code }}" data-person="{{ coupon.person.first_name }} {{ coupon.person.last_name }}" data-email="{{ coupon.person.email }}" data-dni="{{ coupon.person.id_number }}">
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.person.first_name }} {{ coupon.person.last_name }}</td>
+                    <td>{{ coupon.person.email }}</td>
+                    <td>{{ coupon.person.id_number }}</td>
+                    <td>{{ coupon.person.phone }}</td>
+                    <td>{{ coupon.scanned_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if coupon.reprint %}
+                        <span class="admin-chip">Reimpreso</span>
+                        {% elif can_reprint %}
+                        <button class="admin-button admin-button--ghost" type="button" data-reprint data-url="{% url 'raffle_admin:room_reprint_coupon' coupon.id %}">
+                            <span class="material-symbols-rounded" aria-hidden="true">print</span>
+                            <span>Reimprimir</span>
+                        </button>
+                        {% else %}
+                        <span class="admin-chip">Solo lectura</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No hay cupones registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="admin-inline-feedback" data-staff-feedback hidden></p>
+</section>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="{% static 'raffle/js/staff_dashboard.js' %}"></script>
+{% endblock extra_scripts %}

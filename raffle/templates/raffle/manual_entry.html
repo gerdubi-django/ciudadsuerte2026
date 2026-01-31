@@ -1,0 +1,45 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+
+{% block page_title %}Ingreso manual | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_manual_entry_active %}is-active{% endblock nav_manual_entry_active %}
+{% block header_title %}Ingreso manual{% endblock header_title %}
+{% block header_subtitle %}Generá cupones manuales para jugadores registrados.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section admin-section--primary">
+    <header class="admin-section__header">
+        <div>
+            <h2>Datos del jugador</h2>
+            <p>Busca el DNI del participante para generar un cupón manual.</p>
+        </div>
+    </header>
+    <form method="post" class="admin-form" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="admin-alert admin-alert--error">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="admin-form__grid admin-form__grid--compact">
+            <div class="admin-field">
+                <label for="{{ form.id_number.id_for_label }}">{{ form.id_number.label }}</label>
+                {{ form.id_number }}
+                {% if form.id_number.errors %}
+                <div class="admin-field__error">{{ form.id_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="admin-panel admin-panel--muted">
+            <h3 class="admin-panel__title">Formato de cupón</h3>
+            <p class="admin-panel__subtitle">Los cupones manuales se enumeran por sala con el formato MN&lt;Sala&gt;-000001.</p>
+        </div>
+
+        <div class="admin-form__actions">
+            <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:manual_list' %}">Ver pendientes</a>
+            <button class="admin-button" type="submit">Generar cupón</button>
+        </div>
+    </form>
+</section>
+{% endblock content %}

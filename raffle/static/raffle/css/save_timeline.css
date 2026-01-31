@@ -1,0 +1,48 @@
+.save-timeline {
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-top: 18px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.save-timeline__header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.save-timeline__title {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.save-timeline__description {
+    margin: 0;
+    color: #4a4a4a;
+    font-size: 0.95rem;
+}
+
+.save-timeline__chart-wrapper {
+    position: relative;
+    height: 180px;
+    margin-bottom: 12px;
+}
+
+.save-timeline__status {
+    margin: 0;
+    font-weight: 600;
+    color: #10316b;
+}
+
+@media (max-width: 680px) {
+    .save-timeline {
+        padding: 14px;
+    }
+
+    .save-timeline__chart-wrapper {
+        height: 160px;
+    }
+}

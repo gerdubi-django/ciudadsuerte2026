@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'raffle/css/entry.css' %}">
+<link rel="stylesheet" href="{% static 'raffle/css/save_timeline.css' %}">
+<style>
+    /* Page-specific background to ensure full coverage */
+    html, body {
+        background-image: url("{% static 'img/f1.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock styles %}
+
+{% block content %}
+<section class="form-section entry-section">
+    <div class="entry-section__header">
+        <h1 class="content-title">Ingreso con voucher</h1>
+    </div>
+
+    <form method="post" class="entry-form" data-entry-form
+          data-register-url="{% url 'raffle:register' %}"
+          data-person-lookup-url="{% url 'raffle:person_lookup' %}"
+          data-validation-url="{% url 'raffle:entry_validate' %}"
+          data-scan-status-content="{{ scan_status_message|default:'' }}">
+        {% csrf_token %}
+        {{ form.room_id }}
+        {{ form.voucher_code }}
+
+        <!-- Campo invisible para captura del lector -->
+        <input type="text" class="entry-form__capture" data-scan-capture 
+               autocomplete="off" tabindex="-1" spellcheck="false">
+
+        {% if form.non_field_errors %}
+        <p class="error">{{ form.non_field_errors.0 }}</p>
+        {% endif %}
+
+        <div class="form-field">
+            {{ form.id_number.label_tag }}
+            {{ form.id_number }}
+            {% if form.id_number.errors %}
+            <p class="error">{{ form.id_number.errors.0 }}</p>
+            {% endif %}
+        </div>
+        <div class="form-actions">
+            <a href="{% url 'raffle:home' %}" class="button">Volver</a>
+            <button type="button" class="button" data-scan-trigger>Escanear voucher</button>
+        </div>
+
+        <p class="scanner-status" data-scan-status aria-live="polite"></p>
+    </form>
+
+    
+</section>
+{% endblock content %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'raffle/js/voucher_scanner.js' %}"></script>
+<script src="{% static 'raffle/js/vendor/chart.umd.min.js' %}"></script>
+<script src="{% static 'raffle/js/save_timeline.js' %}"></script>
+{% endblock scripts %}

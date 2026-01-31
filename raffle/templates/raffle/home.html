@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'raffle/css/home.css' %}">
+<style>
+    /* Page-specific background to ensure full coverage */
+    html, body {
+        background-image: url("{% static 'img/f1.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock styles %}
+
+{% block content %}
+<section class="home-section">
+    <h1 class="content-title">CIUDAD DE LA SUERTE</h1>
+    <div class="action-group">
+        <a class="button" href="{% url 'raffle:register' %}" style="font-size: 1.2rem;">REGISTRAR POR PRIMERA VEZ</a>
+        <a class="button" href="{% url 'raffle:entry' %}" style="font-size: 1.2rem;">ESCANEAR TICKET</a>
+    </div>
+</section>
+{% endblock content %}

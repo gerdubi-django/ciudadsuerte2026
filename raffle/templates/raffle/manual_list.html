@@ -1,0 +1,90 @@
+{% extends "raffle/admin_base.html" %}
+{% load static raffle_extras %}
+
+{% block page_title %}Cupones manuales pendientes | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_manual_list_active %}is-active{% endblock nav_manual_list_active %}
+{% block header_title %}Pendientes de impresión{% endblock header_title %}
+{% block header_subtitle %}Imprime en lote los cupones manuales que generaste.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section">
+    <header class="admin-section__header">
+        <div>
+            <h2>Cupones generados</h2>
+            <p>
+                {% if is_manager_view %}
+                Supervise los cupones manuales pendientes de todos los cambistas en la sala seleccionada.
+                {% else %}
+                Solo verás los cupones manuales que todavía no se imprimieron.
+                {% endif %}
+            </p>
+        </div>
+        <div class="admin-section__actions">
+            {% if room_form %}
+            <form method="get" class="admin-inline-form">
+                <label class="admin-inline-label" for="{{ room_form.room_id.id_for_label }}">Sala</label>
+                <select name="{{ room_form.room_id.html_name }}" id="{{ room_form.room_id.id_for_label }}" class="admin-select">
+                    {% for value, label in room_form.room_id.field.choices %}
+                    <option value="{{ value }}" {% if room_form.room_id.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label|room_display_name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="admin-button admin-button--ghost" type="submit">Actualizar</button>
+            </form>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="room_id" value="{{ active_room_id }}">
+                <button class="admin-button" type="submit" {% if not coupons %}disabled{% endif %}>
+                    <span class="material-symbols-rounded" aria-hidden="true">print</span>
+                    <span>Imprimir todos</span>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    {% if cashier_summary %}
+    <div class="admin-metric-grid">
+        {% for item in cashier_summary %}
+        <article class="admin-metric">
+            <span class="admin-metric__label">{{ item.created_by__username|default:"Sin asignar" }}</span>
+            <strong class="admin-metric__value">{{ item.total }}</strong>
+            <span class="admin-metric__hint">Pendientes de impresión</span>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Participante</th>
+                    {% if is_manager_view %}
+                    <th>Operador</th>
+                    {% endif %}
+                    <th>DNI</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr>
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.person.first_name }} {{ coupon.person.last_name }}</td>
+                    {% if is_manager_view %}
+                    <td>{{ coupon.created_by.username|default:"-" }}</td>
+                    {% endif %}
+                    <td>{{ coupon.person.id_number }}</td>
+                    <td>{{ coupon.scanned_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if is_manager_view %}5{% else %}4{% endif %}">No hay cupones pendientes de impresión.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock content %}

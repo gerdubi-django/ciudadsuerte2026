@@ -1,0 +1,24 @@
+{% extends "raffle/admin_base.html" %}
+
+{% block page_title %}Error de seguridad | Ciudad de la Suerte{% endblock page_title %}
+{% block header_title %}Error de seguridad{% endblock header_title %}
+{% block header_subtitle %}Protegemos su sesión para mantener la información segura.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section">
+    <header class="admin-section__header">
+        <div>
+            <h2>Verificación CSRF fallida</h2>
+            <p>Para continuar, vuelva a iniciar sesión y repita la acción.</p>
+        </div>
+    </header>
+    <div class="admin-alert admin-alert--error">
+        <p>La solicitud no se pudo validar. {% if reason %}Detalles: {{ reason }}.{% endif %}</p>
+        <p>Puede regresar al panel usando el siguiente enlace.</p>
+    </div>
+    <div class="admin-section__actions">
+        <a class="admin-button" href="{% url 'raffle_admin:dashboard' %}">Ir al dashboard</a>
+        <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:login' %}">Iniciar sesión</a>
+    </div>
+</section>
+{% endblock content %}

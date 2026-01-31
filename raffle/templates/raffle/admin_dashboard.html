@@ -1,0 +1,289 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+{% load raffle_extras %}
+
+{% block page_title %}Dashboard | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_dashboard_active %}is-active{% endblock nav_dashboard_active %}
+{% block header_title %}Dashboard operativo{% endblock header_title %}
+{% block header_subtitle %}Monitoree métricas claves, actividad reciente y estado de los cupones.{% endblock header_subtitle %}
+
+{% block topbar_actions %}{% endblock topbar_actions %}
+
+{% block content %}
+<section class="admin-section admin-section--primary" id="dashboard-overview">
+    <header class="admin-section__header">
+        <div>
+            <h2>Dashboard y estadísticas</h2>
+            <p>Controle indicadores clave con filtros por sala, fechas y tipo de cupón.</p>
+        </div>
+        <div class="admin-chip-group">
+            <span class="admin-chip">Salas activas: {{ room_summary|length }}</span>
+            <span class="admin-chip">Actualizado {% now "d/m/Y H:i" %}</span>
+        </div>
+    </header>
+    <form class="admin-filter-toolbar" method="get">
+        <div class="admin-field">
+            <label for="dashboardRoom">Sala</label>
+            <select class="admin-select" id="dashboardRoom" name="room">
+                <option value="">Todas</option>
+                {% for room_id, room_name in rooms %}
+                <option value="{{ room_id }}" {% if filters.room == room_id %}selected{% endif %}>{{ room_name|room_display_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-field">
+            <label for="dashboardTerminal">Terminal</label>
+            <select class="admin-select" id="dashboardTerminal" name="terminal">
+                <option value="">Todos</option>
+                {% for terminal in terminals %}
+                <option value="{{ terminal }}" {% if filters.terminal == terminal %}selected{% endif %}>{{ terminal }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-field">
+            <label for="dashboardSource">Tipo de cupón</label>
+            <select class="admin-select" id="dashboardSource" name="source">
+                <option value="">Todos</option>
+                {% for value, label in sources %}
+                <option value="{{ value }}" {% if filters.source == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-field">
+            <label for="dashboardDateStart">Fecha desde</label>
+            <input class="admin-input" id="dashboardDateStart" type="date" name="date_start" value="{{ filters.date_start }}">
+        </div>
+        <div class="admin-field">
+            <label for="dashboardDateEnd">Fecha hasta</label>
+            <input class="admin-input" id="dashboardDateEnd" type="date" name="date_end" value="{{ filters.date_end }}">
+        </div>
+        <div class="admin-filter-toolbar__actions">
+            <button class="admin-button" type="submit">Aplicar filtros</button>
+            <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:dashboard' %}">Limpiar</a>
+        </div>
+    </form>
+    <div class="admin-metric-grid">
+        <article class="admin-metric">
+            <span class="admin-metric__label">Cupones totales</span>
+            <strong class="admin-metric__value">{{ dashboard_dataset.totalCoupons|default:0 }}</strong>
+            <span class="admin-metric__hint">Registros generados según los filtros activos.</span>
+        </article>
+        <article class="admin-metric">
+            <span class="admin-metric__label">Cupones recientes</span>
+            <strong class="admin-metric__value">{{ recent_coupons|length }}</strong>
+            <span class="admin-metric__hint">Últimos movimientos sincronizados del sistema.</span>
+        </article>
+        <article class="admin-metric">
+            <span class="admin-metric__label">Vouchers quemados</span>
+            <strong class="admin-metric__value">{{ dashboard_dataset.totalBurned|default:0 }}</strong>
+            <span class="admin-metric__hint">Vouchers inutilizados para evitar duplicados.</span>
+        </article>
+        <article class="admin-metric">
+            <span class="admin-metric__label">Salas activas</span>
+            <strong class="admin-metric__value">{{ room_summary|length }}</strong>
+            <span class="admin-metric__hint">Salas con actividad en el período seleccionado.</span>
+        </article>
+    </div>
+</section>
+
+<section class="admin-section" id="dashboard-charts">
+    <header class="admin-section__header">
+        <div>
+            <h2>Gráficos comparativos</h2>
+            <p>Visualice el desempeño por sala, origen y evolución temporal.</p>
+        </div>
+        <button class="admin-button admin-button--ghost" type="button" data-refresh-charts>Actualizar</button>
+    </header>
+    <div class="admin-visual-grid">
+        <figure class="admin-chart-card">
+            <header>
+                <h3>Cupones por sala</h3>
+                <span>Distribución de cupones emitidos.</span>
+            </header>
+            <div class="admin-chart-card__canvas">
+                <canvas id="chartRooms"></canvas>
+            </div>
+        </figure>
+        <figure class="admin-chart-card">
+            <header>
+                <h3>Origen de cupones</h3>
+                <span>Comparativa entre Registro y Cargó Voucher.</span>
+            </header>
+            <div class="admin-chart-card__canvas">
+                <canvas id="chartSources"></canvas>
+            </div>
+        </figure>
+        <figure class="admin-chart-card admin-chart-card--wide">
+            <header>
+                <h3>Actividad por fecha</h3>
+                <span>Cupones generados en los últimos días.</span>
+            </header>
+            <div class="admin-chart-card__canvas">
+                <canvas id="chartTimeline"></canvas>
+            </div>
+        </figure>
+    </div>
+</section>
+
+<section class="admin-section admin-section--columns" id="dashboard-tables">
+    <article class="admin-panel">
+        <header class="admin-panel__header">
+            <div>
+                <h2 class="admin-panel__title">Actividad reciente</h2>
+                <p class="admin-panel__subtitle">Últimos cupones generados en el sistema.</p>
+            </div>
+            <a class="admin-link" href="{% url 'raffle_admin:coupons' %}">Ir a listados</a>
+        </header>
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Participante</th>
+                        <th>DNI</th>
+                        <th>Sala</th>
+                        <th>Terminal</th>
+                        <th>Origen</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coupon in recent_coupons %}
+                    <tr>
+                        <td>{{ coupon.code }}</td>
+                        <td>{{ coupon.person.first_name }} {{ coupon.person.last_name }}</td>
+                        <td>{{ coupon.person.id_number }}</td>
+                        <td>{{ coupon.room_name|room_display_name }}</td>
+                        <td>{{ coupon.terminal_name|default:"-" }}</td>
+                        <td>{{ coupon.get_source_display }}</td>
+                        <td>{{ coupon.scanned_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">Aún no se registran cupones recientes.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+    <article class="admin-panel">
+        <header class="admin-panel__header">
+            <div>
+                <h2 class="admin-panel__title">Vouchers quemados</h2>
+                <p class="admin-panel__subtitle">Prevenga duplicados monitoreando vouchers bloqueados.</p>
+            </div>
+        </header>
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Participante</th>
+                        <th>DNI</th>
+                        <th>Sala</th>
+                        <th>Terminal</th>
+                        <th>Origen</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for voucher in burned_vouchers %}
+                    <tr>
+                        <td>{{ voucher.code }}</td>
+                        <td>{{ voucher.person.first_name }} {{ voucher.person.last_name }}</td>
+                        <td>{{ voucher.person.id_number }}</td>
+                        <td>{{ voucher.room_name|room_display_name }}</td>
+                        <td>{{ voucher.terminal_name|default:"-" }}</td>
+                        <td>{{ voucher.get_source_display }}</td>
+                        <td>{{ voucher.scanned_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">Sin vouchers quemados registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+    <article class="admin-panel">
+        <header class="admin-panel__header">
+            <div>
+                <h2 class="admin-panel__title">Reimpresiones por usuario</h2>
+                <p class="admin-panel__subtitle">Total de cupones reimpresos por cada operador.</p>
+            </div>
+            <a class="admin-link" href="{% url 'raffle_admin:reprints' %}">Ver historial</a>
+        </header>
+        <div class="admin-table-wrapper">
+            <table class="admin-table admin-table--compact">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in reprint_totals %}
+                    <tr>
+                        <td>{{ row.user__username }}</td>
+                        <td>{{ row.user__first_name }} {{ row.user__last_name }}</td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">Sin reimpresiones registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+
+<section class="admin-section admin-section--actions" id="dashboard-actions">
+    <header class="admin-section__header">
+        <div>
+            <h2>Listados, reportes y configuración</h2>
+            <p>Acceda rápidamente a las áreas principales del panel.</p>
+        </div>
+    </header>
+    <div class="admin-action-grid">
+        <a class="admin-action" href="{% url 'raffle_admin:coupons' %}">
+            <span class="admin-action__icon material-symbols-rounded" aria-hidden="true">library_books</span>
+            <div>
+                <span class="admin-action__title">Listados y reportes</span>
+                <span class="admin-action__description">Búsquedas avanzadas, exportes e impresión rápida.</span>
+            </div>
+        </a>
+        <a class="admin-action" href="{% url 'raffle_admin:configuration' %}">
+            <span class="admin-action__icon material-symbols-rounded" aria-hidden="true">settings</span>
+            <div>
+                <span class="admin-action__title">Configuración del sistema</span>
+                <span class="admin-action__description">Gestione impresoras, temas y ajustes generales.</span>
+            </div>
+        </a>
+    </div>
+</section>
+
+{{ dashboard_dataset|json_script:"dashboard-dataset" }}
+{% endblock content %}
+
+{% block extra_scripts %}
+<script>
+    window.dashboardDataset = window.dashboardDataset || {};
+    (function registerDataset() {
+        const datasetNode = document.getElementById('dashboard-dataset');
+        if (!datasetNode) { return; }
+        try {
+            window.dashboardDataset = JSON.parse(datasetNode.textContent || '{}');
+        } catch (error) {
+            console.error('Dashboard dataset parse error', error);
+            window.dashboardDataset = {};
+        }
+    })();
+</script>
+<script src="{% static 'raffle/js/vendor/chart.umd.min.js' %}"></script>
+<script src="{% static 'raffle/js/admin_charts.js' %}"></script>
+{% endblock extra_scripts %}

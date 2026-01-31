@@ -1,0 +1,73 @@
+/* =========================================================
+   HOME – Ciudad de la Suerte
+   Ajuste de espaciado y estética
+   ========================================================= */
+
+.home-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 40px 0;                  /* ⭐ Más aire hacia arriba/abajo */
+    gap: 40px;                        /* ⭐ Mayor separación general */
+}
+
+/* Título */
+.home-section .content-title {
+    margin-bottom: 10px;
+    text-align: center;
+    color: var(--accent);
+    font-size: 2.2rem;
+    letter-spacing: 0.05em;
+}
+
+/* Contenedor de botones */
+.home-section .action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;                         /* ⭐ Separación entre botones */
+    width: 100%;
+    max-width: 360px;
+}
+
+/* Botones */
+.home-section .button {
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: 999px;
+    border: 2px solid var(--accent);
+    background: var(--button-bg);
+    color: var(--text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.25s ease;
+}
+
+/* Hover */
+.home-section .button:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .home-section {
+        padding: 20px 0;
+        gap: 32px;
+    }
+
+    .home-section .content-title {
+        font-size: 1.9rem;
+    }
+
+    .home-section .action-group {
+        gap: 22px;                     /* ⭐ Mobile: menos separación para equilibrio */
+        max-width: 100%;
+        padding: 0 16px;
+    }
+}

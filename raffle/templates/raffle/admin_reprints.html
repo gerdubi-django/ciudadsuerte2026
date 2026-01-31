@@ -1,0 +1,105 @@
+{% extends "raffle/admin_base.html" %}
+{% load static raffle_extras %}
+
+{% block page_title %}Reimpresiones | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_reprints_active %}is-active{% endblock nav_reprints_active %}
+{% block header_title %}Reimpresiones{% endblock header_title %}
+{% block header_subtitle %}Control de reimpresiones por usuario y detalle de cupones.{% endblock header_subtitle %}
+
+{% block topbar_actions %}
+<a class="admin-button" href="{% url 'raffle_admin:dashboard' %}">Volver al dashboard</a>
+{% endblock topbar_actions %}
+
+{% block content %}
+<section class="admin-section admin-section--primary">
+    <header class="admin-section__header">
+        <div>
+            <h2>Resumen por usuario</h2>
+            <p>Conteo de cuántas reimpresiones realizó cada usuario.</p>
+        </div>
+        <form class="admin-filter-toolbar admin-filter-toolbar--inline" method="get">
+            <div class="admin-field">
+                <label for="reprintRoom">Sala</label>
+                <select class="admin-select" id="reprintRoom" name="room">
+                    <option value="">Todas</option>
+                    {% for room_id, room_name in rooms %}
+                    <option value="{{ room_id }}" {% if selected_room == room_id %}selected{% endif %}>{{ room_name|room_display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="admin-field">
+                <label for="reprintTerminal">Terminal</label>
+                <select class="admin-select" id="reprintTerminal" name="terminal">
+                    <option value="">Todos</option>
+                    {% for terminal in terminals %}
+                    <option value="{{ terminal }}" {% if selected_terminal == terminal %}selected{% endif %}>{{ terminal }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="admin-filter-toolbar__actions">
+                <button class="admin-button" type="submit">Aplicar</button>
+                <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:reprints' %}">Limpiar</a>
+            </div>
+        </form>
+    </header>
+    <div class="admin-table-wrapper">
+        <table class="admin-table admin-table--compact">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Total de reimpresiones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in user_totals %}
+                <tr>
+                    <td>{{ row.user__username }}</td>
+                    <td>{{ row.total }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">No hay reimpresiones registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="admin-section">
+    <header class="admin-section__header">
+        <div>
+            <h2>Detalle de reimpresiones</h2>
+            <p>Lista completa de cupones reimpresos y responsable.</p>
+        </div>
+    </header>
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Cupón</th>
+                    <th>Participante</th>
+                    <th>Usuario</th>
+                    <th>N° Reimpresión</th>
+                    <th>Sala</th>
+                    <th>Terminal</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in reprints %}
+                <tr>
+                    <td>{{ record.coupon.code }}</td>
+                    <td>{{ record.coupon.person.first_name }} {{ record.coupon.person.last_name }}</td>
+                    <td>{{ record.user.username }}</td>
+                    <td>{{ record.reprint_number }}</td>
+                    <td>{{ room_lookup|get_item:record.room_id|default:record.room_id|room_display_name }}</td>
+                    <td>{{ record.coupon.terminal_name|default:"-" }}</td>
+                    <td>{{ record.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6">No se registraron reimpresiones.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock content %}

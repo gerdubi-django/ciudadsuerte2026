@@ -1,0 +1,327 @@
+/* =========================================================
+   NUEVO DISEÑO BASE – CIUDAD DE LA SUERTE 2025
+   Tema: Glassmorphism + Fondo Hero + Estética Elegante
+   ========================================================= */
+
+/* ----------------------------- */
+/* VARIABLES DE TEMA            */
+/* ----------------------------- */
+:root {
+    --accent: #eace92;
+    --accent-soft: rgba(234, 206, 146, 0.5);
+    --text-light: #ffffff;
+    --glass-bg: rgba(0, 0, 0, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --shadow-strong: 0 20px 50px rgba(0, 0, 0, 0.65);
+    --shadow-soft: 0 8px 25px rgba(0, 0, 0, 0.35);
+    --radius: 24px;
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --input-text: #222;
+    --button-bg: rgba(0, 0, 0, 0.75);
+}
+
+/* ----------------------------- */
+/* RESETEO + GENERALES          */
+/* ----------------------------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: "Poppins", sans-serif;
+    color: var(--text-light);
+    overflow: hidden;
+}
+
+/* ----------------------------- */
+/* FONDO HERO A PANTALLA COMPLETA */
+/* ----------------------------- */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("/static/img/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+}
+
+/* Overlay */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.50),
+        rgba(0, 0, 0, 0.80)
+    );
+    z-index: -1;
+}
+
+/* ----------------------------- */
+/* LAYOUT BASE                  */
+/* ----------------------------- */
+.app-main {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ----------------------------- */
+/* PANEL DEL LOGO               */
+/* ----------------------------- */
+.panel--logo {
+    width: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+}
+
+.panel__logo {
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-strong);
+    backdrop-filter: blur(12px);
+}
+
+.panel__logo img {
+    width: 35vw;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 22px rgba(0,0,0,0.6));
+}
+
+/* ----------------------------- */
+/* PANEL DEL CONTENIDO          */
+/* ----------------------------- */
+.panel--content {
+    width: 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* ⭐️ FIX: sin padding para permitir centrado real */
+}
+
+/* Contenedor del formulario */
+.panel__content {
+    width: 100%;
+    max-width: 520px;
+
+    /* ⭐️ FIX: compensamos la falta de padding en panel--content */
+    margin: 40px;
+
+    padding: 50px 42px;
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-strong);
+    animation: panelFade 0.8s ease-out both;
+}
+
+/* Fade-in */
+@keyframes panelFade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------- */
+/* TITULOS                      */
+/* ----------------------------- */
+.content-title {
+    text-align: center;
+    color: var(--accent);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+}
+
+/* ----------------------------- */
+/* FORMULARIOS                  */
+/* ----------------------------- */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+form label {
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+form input:focus,
+form select:focus {
+    border-color: var(--accent-soft);
+    outline: none;
+    box-shadow: var(--shadow-soft);
+}
+
+/* ----------------------------- */
+/* BOTONES                      */
+/* ----------------------------- */
+.button {
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 22px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: var(--button-bg);
+    border: 2px solid var(--accent);
+    color: var(--text-light);
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.25s ease;
+}
+
+.button:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+/* ----------------------------- */
+/* MENSAJES                     */
+/* ----------------------------- */
+.message-list {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.message--error {
+    background: rgba(255, 100, 100, 0.25);
+    border: 1px solid rgba(255, 100, 100, 0.4);
+}
+.message--success {
+    background: rgba(120, 255, 150, 0.25);
+    border: 1px solid rgba(120, 255, 150, 0.4);
+}
+
+/* ----------------------------- */
+/* RESPONSIVE                   */
+/* ----------------------------- */
+@media (max-width: 1024px) {
+    .app-main {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .panel--logo {
+        width: 100%;
+        padding: 40px 20px 20px;
+    }
+
+    .panel--content {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .panel__content {
+        max-width: none;
+        margin: 20px;
+        padding: 40px 26px;
+    }
+}
+
+@media (max-width: 640px) {
+    .content-title {
+        font-size: 1.6rem;
+    }
+
+    .panel__content {
+        padding: 32px 22px;
+    }
+    .panel__logo img {
+        width: 75vw;
+    }
+}
+
+/* =========================================================
+   OPTIMIZACIÓN PARA PANTALLAS HORIZONTALES (PC / MONITORES)
+   Distribución simétrica y mejor uso del espacio horizontal
+   ========================================================= */
+
+@media (min-width: 1200px) and (orientation: landscape) {
+
+    /* PANEL DEL LOGO Y PANEL DEL FORMULARIO */
+    .panel--logo {
+        width: 40%;   /* Antes 45% */
+        padding: 60px 40px;
+    }
+
+    .panel--content {
+        width: 60%;   /* Antes 55% */
+        padding: 60px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* PANEL INTERNO (FORMULARIO) */
+    .panel__content {
+        max-width: 620px;   /* ⭐ Más ancho: proporción más natural */
+        width: 100%;
+        margin: 0 auto;     /* ⭐ Centrado absoluto */
+        padding: 50px 50px; /* ⭐ Espaciado interno más equilibrado */
+        border-radius: 30px;
+    }
+
+    /* TÍTULO */
+    .content-title {
+        font-size: 2.3rem;
+        margin-bottom: 32px;
+    }
+
+    /* INPUTS */
+    form input,
+    form select {
+        padding: 16px 20px;
+        border-radius: 18px;
+        font-size: 1.05rem;
+    }
+
+    /* BOTONES */
+    .button {
+        padding: 16px 26px;
+        font-size: 1rem;
+        border-radius: 999px;
+    }
+
+}

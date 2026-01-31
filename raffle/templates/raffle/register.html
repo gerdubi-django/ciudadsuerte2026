@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'raffle/css/register.css' %}">
+<link rel="stylesheet" href="{% static 'raffle/css/save_timeline.css' %}">
+<style>
+    html, body {
+        background-image: url("{% static 'img/f1.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+</style>
+{% endblock styles %}
+
+{% block content %}
+<section class="form-section">
+    <h1 class="content-title">Registrar participante</h1>
+
+    <form method="post" action="">
+        {% csrf_token %}
+
+        {{ form.room_id }}
+
+        {% if form.non_field_errors %}
+        <p class="error">{{ form.non_field_errors.0 }}</p>
+        {% endif %}
+
+        <div>
+            {{ form.first_name.label_tag }}
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+            <p class="error">{{ form.first_name.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.last_name.label_tag }}
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+            <p class="error">{{ form.last_name.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.id_number.label_tag }}
+            {{ form.id_number }}
+            {% if form.id_number.errors %}
+            <p class="error">{{ form.id_number.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.errors %}
+            <p class="error">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.phone.label_tag }}
+            {{ form.phone }}
+            {% if form.phone.errors %}
+            <p class="error">{{ form.phone.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.birth_date.label_tag }}
+            {{ form.birth_date }}
+            {% if form.birth_date.errors %}
+            <p class="error">{{ form.birth_date.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="terms-legend">
+            <p>{{ system_settings.terms_text }}</p>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'raffle:home' %}" class="button">Volver</a>
+            <button type="submit" class="button">Registrar</button>
+        </div>
+    </form>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'raffle/js/vendor/chart.umd.min.js' %}"></script>
+<script src="{% static 'raffle/js/save_timeline.js' %}"></script>
+{% endblock scripts %}

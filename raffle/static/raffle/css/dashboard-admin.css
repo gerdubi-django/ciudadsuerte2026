@@ -1,0 +1,46 @@
+:root {
+    /* Admin dashboard palette overrides. */
+    --admin-color-primary: #6366f1;
+    --admin-color-primary-soft: rgba(99, 102, 241, 0.18);
+    --admin-color-primary-strong: #4f46e5;
+    --admin-color-accent: #22d3ee;
+    --admin-color-surface: #ffffff;
+    --admin-color-surface-alt: #f5f7ff;
+    --admin-color-background: #eef2ff;
+    --admin-color-border: rgba(15, 23, 42, 0.1);
+    --admin-color-text: #0f172a;
+    --admin-color-text-muted: rgba(15, 23, 42, 0.68);
+    --admin-color-danger: #ef4444;
+    --admin-color-success: #22c55e;
+    --admin-color-warning: #f97316;
+    --admin-shadow-soft: 0 18px 40px rgba(79, 70, 229, 0.15);
+    --admin-shadow-elevated: 0 24px 48px rgba(15, 23, 42, 0.16);
+    --admin-sidebar-gradient: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%);
+    --admin-banner-gradient: radial-gradient(circle at top right, rgba(99, 102, 241, 0.24), transparent 55%);
+}
+
+[data-theme="dark"] {
+    /* Admin dark theme parity. */
+    --admin-color-primary: #818cf8;
+    --admin-color-primary-soft: rgba(129, 140, 248, 0.22);
+    --admin-color-primary-strong: #6366f1;
+    --admin-color-accent: #38bdf8;
+    --admin-color-surface: #111827;
+    --admin-color-surface-alt: #1f2937;
+    --admin-color-background: #0b1220;
+    --admin-color-border: rgba(148, 163, 184, 0.16);
+    --admin-color-text: rgba(226, 232, 240, 0.98);
+    --admin-color-text-muted: rgba(148, 163, 184, 0.78);
+    --admin-shadow-soft: 0 18px 36px rgba(15, 23, 42, 0.42);
+    --admin-shadow-elevated: 0 30px 56px rgba(15, 23, 42, 0.58);
+    --admin-sidebar-gradient: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    --admin-banner-gradient: radial-gradient(circle at top right, rgba(129, 140, 248, 0.28), transparent 60%);
+}
+
+.admin-main {
+    background: linear-gradient(180deg, var(--admin-color-surface) 0%, var(--admin-color-surface-alt) 50%, var(--admin-color-background) 100%);
+}
+
+.admin-section--primary {
+    box-shadow: var(--admin-shadow-soft);
+}

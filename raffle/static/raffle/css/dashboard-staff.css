@@ -1,0 +1,47 @@
+:root {
+    /* Staff dashboard palette overrides. */
+    --admin-color-primary: #22c55e;
+    --admin-color-primary-soft: rgba(34, 197, 94, 0.18);
+    --admin-color-primary-strong: #16a34a;
+    --admin-color-accent: #0ea5e9;
+    --admin-color-surface: #ffffff;
+    --admin-color-surface-alt: #f4fff8;
+    --admin-color-background: #ecfdf3;
+    --admin-color-border: rgba(15, 23, 42, 0.08);
+    --admin-color-text: #0f172a;
+    --admin-color-text-muted: rgba(15, 23, 42, 0.6);
+    --admin-color-danger: #ef4444;
+    --admin-color-success: #22c55e;
+    --admin-color-warning: #f59e0b;
+    --admin-shadow-soft: 0 18px 40px rgba(22, 163, 74, 0.18);
+    --admin-shadow-elevated: 0 24px 48px rgba(15, 23, 42, 0.18);
+    --admin-sidebar-gradient: linear-gradient(180deg, #16a34a 0%, #0f766e 100%);
+    --admin-banner-gradient: radial-gradient(circle at top right, rgba(34, 197, 94, 0.22), transparent 55%);
+}
+
+[data-theme="dark"] {
+    /* Staff dark theme palette. */
+    --admin-color-primary: #34d399;
+    --admin-color-primary-soft: rgba(52, 211, 153, 0.2);
+    --admin-color-primary-strong: #22c55e;
+    --admin-color-accent: #0ea5e9;
+    --admin-color-surface: #0b1220;
+    --admin-color-surface-alt: #111827;
+    --admin-color-background: #052e16;
+    --admin-color-border: rgba(148, 163, 184, 0.2);
+    --admin-color-text: rgba(226, 232, 240, 0.98);
+    --admin-color-text-muted: rgba(148, 163, 184, 0.74);
+    --admin-shadow-soft: 0 18px 36px rgba(34, 197, 94, 0.28);
+    --admin-shadow-elevated: 0 30px 56px rgba(15, 23, 42, 0.56);
+    --admin-sidebar-gradient: linear-gradient(180deg, #0f172a 0%, #052e16 100%);
+    --admin-banner-gradient: radial-gradient(circle at top right, rgba(52, 211, 153, 0.3), transparent 60%);
+}
+
+.admin-chip {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-section--primary {
+    backdrop-filter: blur(2px);
+}

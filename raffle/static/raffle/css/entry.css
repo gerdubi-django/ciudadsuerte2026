@@ -1,0 +1,163 @@
+/* =========================================================
+   ENTRY – Ciudad de la Suerte
+   Misma estética del REGISTER (Glass + Premium)
+   ========================================================= */
+
+/* ---------- CONTENEDOR GENERAL ---------- */
+.entry-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+    gap: 28px;
+}
+
+/* Título */
+.entry-section__header .content-title {
+    margin-bottom: 4px;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 0.05em;
+}
+
+/* ---------- FORMULARIO ---------- */
+.entry-form {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Campo invisible del lector */
+.entry-form__capture {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+    opacity: 0;
+    z-index: -1;
+}
+
+/* Campo DNI */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-field label {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-light);
+}
+
+.form-field input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 1rem;
+    transition: all 0.25s ease;
+}
+
+.form-field input:focus {
+    border-color: var(--accent-soft);
+    outline: none;
+    box-shadow: var(--shadow-soft);
+}
+
+/* -------- MENSAJES DE ERROR -------- */
+.error {
+    color: #ffb4b4;
+    font-size: 0.9rem;
+}
+
+/* ---------- BOTONES ---------- */
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.form-actions .button {
+    width: 100%;
+    padding: 14px 22px;
+    border-radius: 999px;
+    border: 2px solid var(--accent);
+    background: var(--button-bg);
+    color: var(--text-light);
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.form-actions .button:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+/* ---------- ESTADO DEL SCANNER ---------- */
+.scanner-status {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-height: 22px;
+    transition: all 0.3s ease;
+    margin-top: -4px;
+}
+
+.scanner-status--info {
+    color: var(--accent);
+}
+
+.scanner-status--error {
+    color: #ff6767;
+    animation: shake 0.35s ease;
+}
+
+.scanner-status--success {
+    color: #a6ff9e;
+}
+
+/* Animación shake */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+}
+
+/* ---------- RESPONSIVE TAB / PC ---------- */
+@media (min-width: 900px) and (orientation: landscape) {
+
+    .entry-form {
+        max-width: 580px;     /* igual que register */
+        gap: 24px;
+    }
+
+    .form-actions {
+        flex-direction: row;
+        gap: 18px;
+        justify-content: center;
+    }
+
+    .form-actions .button {
+        width: 50%;          /* cada botón ocupa media fila */
+    }
+}

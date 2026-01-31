@@ -1,0 +1,171 @@
+{% load static raffle_extras %}
+<!DOCTYPE html>
+<html lang="es" data-theme="{{ theme_preference|default:'light' }}" data-dashboard-role="{{ dashboard_role|default:'guest' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block page_title %}Panel administrativo{% endblock page_title %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'raffle/css/dashboard-core.css' %}">
+    <link rel="stylesheet" href="{% static 'raffle/css/dashboard-app.css' %}">
+    {% block extra_styles %}{% endblock extra_styles %}
+</head>
+<body class="admin-body">
+    <div class="admin-shell">
+        <aside class="admin-sidebar" id="admin-sidebar" data-admin-sidebar>
+            <div class="admin-sidebar__brand">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" class="admin-sidebar__logo">
+                <span class="admin-sidebar__name">Ciudad de la Suerte</span>
+            </div>
+
+            <button class="admin-sidebar__toggle" type="button" data-sidebar-toggle>
+                <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+                <span class="admin-visually-hidden">Alternar navegación</span>
+            </button>
+
+            <nav class="admin-sidebar__nav">
+
+                {% if active_user and active_user.is_authenticated and active_user.is_admin %}
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Dashboard y estadísticas</span>
+                    <a class="admin-sidebar__link {% block nav_dashboard_active %}{% endblock nav_dashboard_active %}" href="{% url 'raffle_admin:dashboard' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">monitoring</span>
+                        <span>Dashboard general</span>
+                    </a>
+                </div>
+
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Listados y reportes</span>
+                    <a class="admin-sidebar__link {% block nav_coupons_active %}{% endblock nav_coupons_active %}" href="{% url 'raffle_admin:coupons' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">table</span>
+                        <span>Listado de cupones</span>
+                    </a>
+                    <a class="admin-sidebar__link {% block nav_reprints_active %}{% endblock nav_reprints_active %}" href="{% url 'raffle_admin:reprints' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">history</span>
+                        <span>Reimpresiones</span>
+                    </a>
+                </div>
+
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Configuración</span>
+                    <a class="admin-sidebar__link {% block nav_configuration_active %}{% endblock nav_configuration_active %}" href="{% url 'raffle_admin:configuration' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+                        <span>Ajustes del sistema</span>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if active_user and active_user.is_authenticated and active_user.has_operator_access and not active_user.is_cashier_only %}
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Operación de sala</span>
+                    <a class="admin-sidebar__link {% block nav_room_active %}{% endblock nav_room_active %}" href="{% url 'raffle_admin:room_dashboard' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+                        <span>Reportes de sala</span>
+                    </a>
+                    {% if not active_user.is_floor_manager %}
+                    <a class="admin-sidebar__link {% block nav_entry_active %}{% endblock nav_entry_active %}" href="{% url 'raffle_admin:staff_entry' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">qr_code_scanner</span>
+                        <span>Ingreso</span>
+                    </a>
+                    <a class="admin-sidebar__link {% block nav_register_active %}{% endblock nav_register_active %}" href="{% url 'raffle_admin:staff_register' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                        <span>Registrar participante</span>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if active_user and active_user.is_authenticated and active_user.has_manual_access %}
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Ingreso manual</span>
+                    <a class="admin-sidebar__link {% block nav_manual_entry_active %}{% endblock nav_manual_entry_active %}" href="{% url 'raffle_admin:manual_entry' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">edit_square</span>
+                        <span>Ingreso manual</span>
+                    </a>
+                    <a class="admin-sidebar__link {% block nav_manual_list_active %}{% endblock nav_manual_list_active %}" href="{% url 'raffle_admin:manual_list' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">print</span>
+                        <span>Listar pendientes</span>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if active_user and active_user.is_authenticated and active_user.has_reprint_access %}
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Reimpresiones</span>
+                    <a class="admin-sidebar__link {% block nav_room_reprints_active %}{% endblock nav_room_reprints_active %}" href="{% url 'raffle_admin:room_dashboard' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">history_toggle_off</span>
+                        <span>Reimprimir cupones</span>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if active_user and active_user.is_authenticated and active_user.is_cashier_only %}
+                <div class="admin-sidebar__section">
+                    <span class="admin-sidebar__section-label">Cuenta</span>
+                    <a class="admin-sidebar__link {% block nav_password_change_active %}{% endblock nav_password_change_active %}" href="{% url 'raffle_admin:password_change' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">key</span>
+                        <span>Cambiar contraseña</span>
+                    </a>
+                </div>
+                {% endif %}
+
+            </nav>
+        </aside>
+
+        <div class="admin-sidebar__scrim" data-sidebar-scrim></div>
+
+        <div class="admin-main">
+
+            <header class="admin-topbar">
+                <div class="admin-topbar__group">
+                    <button class="admin-icon-button" type="button" data-sidebar-toggle aria-controls="admin-sidebar" aria-expanded="false">
+                        <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+                        <span class="admin-visually-hidden">Abrir navegación</span>
+                    </button>
+                    <div class="admin-topbar__titles">
+                        <h1 class="admin-topbar__title">{% block header_title %}Panel administrativo{% endblock header_title %}</h1>
+                        <p class="admin-topbar__subtitle">{% block header_subtitle %}Gestione sorteos, cupones y configuración general.{% endblock header_subtitle %}</p>
+                    </div>
+                </div>
+                <div class="admin-topbar__actions">
+                    {% if active_user and active_user.is_authenticated %}
+                    <div class="admin-topbar__user">
+                        <span class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+                        <span class="admin-topbar__user-name">{{ active_user.display_name }}</span>
+                    </div>
+                    <a class="admin-button admin-button--ghost admin-button--logout" href="{% url 'raffle_admin:logout' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+                        <span>Cerrar sesión</span>
+                    </a>
+                    {% endif %}
+                    {% block topbar_actions %}{% endblock topbar_actions %}
+                </div>
+            </header>
+
+            <main class="admin-content">
+                {% if messages %}
+                <div class="admin-alert-stack">
+                    {% for message in messages %}
+                    <div class="admin-alert admin-alert--{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock content %}
+            </main>
+
+            <footer class="admin-footer">
+                <span>© Casinos Gala Resistencia - Sorteo Ciudad de la Suerte</span>
+                <span class="admin-footer__meta">Panel actualizado {% now "d/m/Y" %}</span>
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="{% static 'raffle/js/admin_app.js' %}"></script>
+    {% block extra_scripts %}{% endblock extra_scripts %}
+</body>
+</html>

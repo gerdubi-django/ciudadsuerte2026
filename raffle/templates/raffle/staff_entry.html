@@ -1,0 +1,62 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+
+{% block page_title %}Ingreso con voucher | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_entry_active %}is-active{% endblock nav_entry_active %}
+{% block header_title %}Ingreso con voucher{% endblock header_title %}
+{% block header_subtitle %}Validá vouchers y genera cupones desde el panel.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section admin-section--primary">
+    <header class="admin-section__header">
+        <div>
+            <h2>Escanear voucher</h2>
+            <p>Busca el DNI del participante y registra el ingreso con el multiplicador operativo.</p>
+        </div>
+        {% if system_settings.operational_hours %}
+        <div class="admin-chip-group">
+            <span class="admin-chip">Multiplicador activo: {{ system_settings.operational_hours.0.multiplier }}x</span>
+        </div>
+        {% endif %}
+    </header>
+    <form method="post" class="admin-form" novalidate
+          data-entry-form
+          data-register-url="{% url 'raffle_admin:staff_register' %}"
+          data-person-lookup-url="{% url 'raffle:person_lookup' %}">
+        {% csrf_token %}
+        {{ form.room_id }}
+        {{ form.voucher_code }}
+
+        <input type="text" class="admin-input" data-scan-capture autocomplete="off" tabindex="-1" spellcheck="false" style="position:absolute; opacity:0; z-index:-1;">
+
+        {% if form.non_field_errors %}
+        <div class="admin-alert admin-alert--error">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="admin-form__grid admin-form__grid--compact">
+            <div class="admin-field">
+                <label for="{{ form.id_number.id_for_label }}">{{ form.id_number.label }}</label>
+                {{ form.id_number }}
+                {% if form.id_number.errors %}
+                <div class="admin-field__error">{{ form.id_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="admin-panel admin-panel--muted">
+            <h3 class="admin-panel__title">Cómo funciona</h3>
+            <p class="admin-panel__subtitle">Presione "Escanear voucher" para activar el lector y generar el cupón.</p>
+            <p class="admin-inline-feedback" data-scan-status aria-live="polite"></p>
+        </div>
+
+        <div class="admin-form__actions">
+            <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:room_dashboard' %}">Ver reportes</a>
+            <button type="button" class="admin-button" data-scan-trigger>Escanear voucher</button>
+        </div>
+    </form>
+</section>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="{% static 'raffle/js/voucher_scanner.js' %}"></script>
+{% endblock extra_scripts %}

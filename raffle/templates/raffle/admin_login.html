@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static raffle_extras %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'raffle/css/dashboard-core.css' %}">
+<link rel="stylesheet" href="{% static 'raffle/css/dashboard-app.css' %}">
+{% endblock styles %}
+
+{% block content %}
+<h1 class="content-title">Panel de Administración</h1>
+<p class="content-subtitle">Inicie sesión para acceder al dashboard de control.</p>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+    {% for field in form %}
+    <div>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.name == "room_id" %}
+        <select name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="admin-select">
+            {% for value, label in field.field.choices %}
+            <option value="{{ value }}" {% if field.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label|room_display_name }}</option>
+            {% endfor %}
+        </select>
+        {% else %}
+        {{ field }}
+        {% endif %}
+        {% if field.errors %}
+        <div class="form-error">{{ field.errors|striptags }}</div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% if form.non_field_errors %}
+    <div class="form-error">{{ form.non_field_errors|striptags }}</div>
+    {% endif %}
+    <input type="submit" value="Ingresar">
+</form>
+{% endblock content %}

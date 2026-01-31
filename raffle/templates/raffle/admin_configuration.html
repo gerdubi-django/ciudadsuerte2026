@@ -1,0 +1,524 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+
+{% block page_title %}Configuración | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_configuration_active %}is-active{% endblock nav_configuration_active %}
+{% block header_title %}Configuración del sistema{% endblock header_title %}
+{% block header_subtitle %}Administre impresoras, preferencias visuales y temas del panel.{% endblock header_subtitle %}
+
+{% block topbar_actions %}
+<a class="admin-button" href="{% url 'raffle_admin:dashboard' %}">Volver al dashboard</a>
+{% endblock topbar_actions %}
+
+{% block content %}
+<div class="admin-tabs" data-admin-tabs>
+    <button class="admin-tab {% if active_tab == 'printers' %}is-active{% endif %}" type="button" data-tab-target="printers">Ajustes de impresión</button>
+    <button class="admin-tab {% if active_tab == 'system' %}is-active{% endif %}" type="button" data-tab-target="system">Preferencias del sistema</button>
+    <button class="admin-tab {% if active_tab == 'rooms' %}is-active{% endif %}" type="button" data-tab-target="rooms">Salas</button>
+    <button class="admin-tab {% if active_tab == 'users' %}is-active{% endif %}" type="button" data-tab-target="users">Usuarios</button>
+</div>
+
+<div data-tab-panel="printers" {% if active_tab != 'printers' %}hidden{% endif %}>
+    <section class="admin-section admin-section--primary">
+        <header class="admin-section__header">
+            <div>
+                <h2>Impresora local</h2>
+                <p>Seleccione el nombre y puerto de impresión almacenados en este terminal.</p>
+            </div>
+            <div class="admin-chip-group">
+                {% if terminal_config %}
+                <span class="admin-chip">Impresora: {{ terminal_config.printer_name }}</span>
+                <span class="admin-chip">Puerto: {{ terminal_config.printer_port }}</span>
+                {% else %}
+                <span class="admin-chip">Terminal sin configuración local</span>
+                {% endif %}
+            </div>
+        </header>
+        <form method="post" class="admin-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="local_printer">
+            <div class="admin-form__grid">
+                <div class="admin-field">
+                    <label for="{{ local_printer_form.printer_name.id_for_label }}">{{ local_printer_form.printer_name.label }}</label>
+                    {{ local_printer_form.printer_name }}
+                    {% if local_printer_form.printer_name.errors %}
+                    <div class="admin-field__error">{{ local_printer_form.printer_name.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ local_printer_form.printer_port.id_for_label }}">{{ local_printer_form.printer_port.label }}</label>
+                    {{ local_printer_form.printer_port }}
+                    {% if local_printer_form.printer_port.errors %}
+                    <div class="admin-field__error">{{ local_printer_form.printer_port.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="admin-form__actions">
+                <button class="admin-button" type="submit">Guardar impresora local</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Opciones de impresora</h2>
+                <p>Defina puertos, anchos y parámetros generales para la emisión de cupones.</p>
+            </div>
+            {% if configuration.updated_at %}
+            <span class="admin-chip">Última actualización: {{ configuration.updated_at|date:"d/m/Y H:i" }}</span>
+            {% else %}
+            <span class="admin-chip">Configuración inicial</span>
+            {% endif %}
+        </header>
+        <form method="post" class="admin-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="printers">
+            <div class="admin-form__grid">
+                {% for field in form %}
+                {% if field.name != 'theme_preference' %}
+                <div class="admin-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="admin-field__error">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="admin-form__actions">
+                <button class="admin-button" type="submit">Guardar configuración</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Preferencias de interfaz</h2>
+                <p>Personalice animaciones, densidad y accesos rápidos del panel.</p>
+            </div>
+        </header>
+        <div class="admin-preference-grid">
+            <div class="admin-preference" data-preference="animations">
+                <div class="admin-preference__header">
+                    <h3>Animaciones suaves</h3>
+                    <p>Active o desactive transiciones suaves en toda la interfaz.</p>
+                </div>
+                <label class="admin-switch">
+                    <input type="checkbox" data-preference-toggle="animations" checked>
+                    <span class="admin-switch__slider"></span>
+                </label>
+            </div>
+            <div class="admin-preference" data-preference="density">
+                <div class="admin-preference__header">
+                    <h3>Densidad de información</h3>
+                    <p>Seleccione el modo compacto para ver más filas por tabla.</p>
+                </div>
+                <div class="admin-segmented" role="group" aria-label="Nivel de densidad">
+                    <button type="button" class="admin-segmented__button is-active" data-density="comfortable">Cómodo</button>
+                    <button type="button" class="admin-segmented__button" data-density="compact">Compacto</button>
+                </div>
+            </div>
+            <div class="admin-preference" data-preference="shortcuts">
+                <div class="admin-preference__header">
+                    <h3>Atajos visibles</h3>
+                    <p>Muestre accesos directos y recordatorios de acciones frecuentes.</p>
+                </div>
+                <label class="admin-switch">
+                    <input type="checkbox" data-preference-toggle="shortcuts" checked>
+                    <span class="admin-switch__slider"></span>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Dispositivos USB detectados</h2>
+                <p>Revise las impresoras disponibles conectadas al sistema.</p>
+            </div>
+            <div class="admin-panel__actions">
+                <button class="admin-button" type="button" data-usb-refresh data-usb-endpoint="{% url 'raffle_admin:configuration_printers' %}" {% if not pyusb_available %}disabled{% endif %}>
+                    Buscar dispositivos USB
+                </button>
+            </div>
+        </header>
+        {% if not pyusb_available %}
+        <p class="admin-empty">Instale la librería <code>pyusb</code> para detectar impresoras USB disponibles.</p>
+        {% else %}
+        <p class="admin-usb-status" data-usb-status>
+            {% if usb_devices %}
+            Se detectaron {{ usb_devices|length }} dispositivo(s) conectado(s).
+            {% else %}
+            Presione «Buscar dispositivos USB» para iniciar un escaneo bajo demanda.
+            {% endif %}
+        </p>
+        <div class="admin-table-wrapper" data-usb-table {% if not usb_devices %}hidden{% endif %}>
+            <table class="admin-table admin-table--compact">
+                <thead>
+                    <tr>
+                        <th>Fabricante</th>
+                        <th>Producto</th>
+                        <th>VID</th>
+                        <th>PID</th>
+                    </tr>
+                </thead>
+                <tbody data-usb-results>
+                    {% if usb_devices %}
+                    {% for device in usb_devices %}
+                    <tr>
+                        <td>{{ device.manufacturer }}</td>
+                        <td>{{ device.name }}</td>
+                        <td>{{ device.vendor_id }}</td>
+                        <td>{{ device.product_id }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<div data-tab-panel="system" {% if active_tab != 'system' %}hidden{% endif %}>
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Identidad y sala</h2>
+                <p>Actualice el nombre de este terminal y la sala asociada.</p>
+            </div>
+            <div class="admin-chip-group">
+                <span class="admin-chip">ID local: {{ system_settings.terminal_identifier }}</span>
+                <span class="admin-chip">Última actualización: {{ system_settings.updated_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </header>
+        <form method="post" class="admin-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="system">
+            {{ settings_form.operational_hours }}
+            <div class="admin-form__grid">
+                <div class="admin-field">
+                    <label for="{{ settings_form.terminal_name.id_for_label }}">{{ settings_form.terminal_name.label }}</label>
+                    {{ settings_form.terminal_name }}
+                    {% if settings_form.terminal_name.errors %}
+                    <div class="admin-field__error">{{ settings_form.terminal_name.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ settings_form.company_name.id_for_label }}">{{ settings_form.company_name.label }}</label>
+                    {{ settings_form.company_name }}
+                    {% if settings_form.company_name.errors %}
+                    <div class="admin-field__error">{{ settings_form.company_name.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ settings_form.current_room_id.id_for_label }}">{{ settings_form.current_room_id.label }}</label>
+                    {{ settings_form.current_room_id }}
+                    {% if settings_form.current_room_id.errors %}
+                    <div class="admin-field__error">{{ settings_form.current_room_id.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ settings_form.entry_hours_start.id_for_label }}">{{ settings_form.entry_hours_start.label }}</label>
+                    {{ settings_form.entry_hours_start }}
+                    {% if settings_form.entry_hours_start.help_text %}
+                    <p class="admin-field__hint">{{ settings_form.entry_hours_start.help_text }}</p>
+                    {% endif %}
+                    {% if settings_form.entry_hours_start.errors %}
+                    <div class="admin-field__error">{{ settings_form.entry_hours_start.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ settings_form.entry_hours_end.id_for_label }}">{{ settings_form.entry_hours_end.label }}</label>
+                    {{ settings_form.entry_hours_end }}
+                    {% if settings_form.entry_hours_end.help_text %}
+                    <p class="admin-field__hint">{{ settings_form.entry_hours_end.help_text }}</p>
+                    {% endif %}
+                    {% if settings_form.entry_hours_end.errors %}
+                    <div class="admin-field__error">{{ settings_form.entry_hours_end.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ settings_form.entry_multiplier.id_for_label }}">{{ settings_form.entry_multiplier.label }}</label>
+                    {{ settings_form.entry_multiplier }}
+                    {% if settings_form.entry_multiplier.help_text %}
+                    <p class="admin-field__hint">{{ settings_form.entry_multiplier.help_text }}</p>
+                    {% endif %}
+                    {% if settings_form.entry_multiplier.errors %}
+                    <div class="admin-field__error">{{ settings_form.entry_multiplier.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="admin-form__grid">
+                <div class="admin-field admin-field--full">
+                    <label for="{{ settings_form.coupon_legend.id_for_label }}">{{ settings_form.coupon_legend.label }}</label>
+                    {{ settings_form.coupon_legend }}
+                    {% if settings_form.coupon_legend.errors %}
+                    <div class="admin-field__error">{{ settings_form.coupon_legend.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field admin-field--full">
+                    <label for="{{ settings_form.terms_text.id_for_label }}">{{ settings_form.terms_text.label }}</label>
+                    {{ settings_form.terms_text }}
+                    {% if settings_form.terms_text.errors %}
+                    <div class="admin-field__error">{{ settings_form.terms_text.errors|striptags }}</div>
+                    {% endif %}
+                    <p class="admin-field__hint">El texto se mostrará debajo del formulario de registro público.</p>
+                </div>
+            </div>
+            <div class="admin-section__header">
+                <div>
+                    <h2>Tema del terminal</h2>
+                    <p>Seleccione el esquema de color aplicado antes de renderizar cada vista.</p>
+                </div>
+            </div>
+            <div class="admin-theme-settings">
+                <div class="admin-theme-settings__control">
+                    <label for="{{ settings_form.theme_preference.id_for_label }}">Esquema de color</label>
+                    {{ settings_form.theme_preference }}
+                    {% if settings_form.theme_preference.errors %}
+                    <div class="admin-field__error">{{ settings_form.theme_preference.errors|striptags }}</div>
+                    {% endif %}
+                    <p class="admin-theme-settings__hint">El tema se sincroniza con esta terminal y con el selector rápido.</p>
+                </div>
+                <div class="admin-theme-settings__preview">
+                    <article class="admin-theme-preview admin-theme-preview--light">
+                        <h3>Vista previa clara</h3>
+                        <p>Fondos luminosos con tarjetas suaves y tipografías oscuras.</p>
+                    </article>
+                    <article class="admin-theme-preview admin-theme-preview--dark">
+                        <h3>Vista previa oscura</h3>
+                        <p>Contraste equilibrado pensado para entornos nocturnos.</p>
+                    </article>
+                </div>
+                <div class="admin-theme-settings__contrast">
+                    <div>
+                        <h3>Contraste aumentado</h3>
+                        <p>Refuerza la visibilidad de textos y contornos en todo el panel.</p>
+                    </div>
+                    <label class="admin-switch">
+                        <input type="checkbox" data-theme-contrast>
+                        <span class="admin-switch__slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="admin-form__actions">
+                <button class="admin-button" type="submit">Guardar preferencias</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Normalización de participantes</h2>
+                <p>Convierta todos los nombres a Title Case para mejorar la legibilidad.</p>
+            </div>
+        </header>
+        <form method="post" action="{% url 'raffle_admin:normalize_participants' %}">
+            {% csrf_token %}
+            <div class="admin-form__actions">
+                <button class="admin-button" type="submit">Normalizar nombres</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+<div data-tab-panel="rooms" {% if active_tab != 'rooms' %}hidden{% endif %}>
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Administración de salas</h2>
+                <p>Defina el nombre visible y la IP asociada a cada sala.</p>
+            </div>
+            <span class="admin-chip">{{ room_formset.total_form_count }} sala(s)</span>
+        </header>
+        <form method="post" class="admin-form" novalidate data-room-formset>
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="rooms">
+            {{ room_formset.management_form }}
+            <div class="admin-card-grid" data-room-forms>
+                {% for room_form in room_formset %}
+                <div class="admin-card" data-room-form>
+                    {% for hidden_field in room_form.hidden_fields %}{{ hidden_field }}{% endfor %}
+                    <div class="admin-field">
+                        <label for="{{ room_form.name.id_for_label }}">{{ room_form.name.label }}</label>
+                        {{ room_form.name }}
+                        {% if room_form.name.errors %}
+                        <div class="admin-field__error">{{ room_form.name.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="admin-field">
+                        <label for="{{ room_form.room_ip.id_for_label }}">{{ room_form.room_ip.label }}</label>
+                        {{ room_form.room_ip }}
+                        {% if room_form.room_ip.errors %}
+                        <div class="admin-field__error">{{ room_form.room_ip.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="admin-empty">No hay salas configuradas.</p>
+                {% endfor %}
+            </div>
+            {% if room_formset.non_form_errors %}
+            <div class="admin-field__error">{{ room_formset.non_form_errors|striptags }}</div>
+            {% endif %}
+            <div class="admin-form__actions">
+                <button class="admin-button" type="submit">Guardar salas</button>
+            </div>
+        </form>
+    </section>
+</div>
+
+<div data-tab-panel="users" {% if active_tab != 'users' %}hidden{% endif %}>
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Gestión de usuarios</h2>
+                <p>Cree, edite o desactive usuarios del panel administrativo.</p>
+            </div>
+            {% if editing_user %}
+            <span class="admin-chip">Editando {{ editing_user.username }}</span>
+            {% else %}
+            <span class="admin-chip">Alta de nuevo usuario</span>
+            {% endif %}
+        </header>
+        <form method="post" class="admin-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="users">
+            {% if editing_user %}
+            <input type="hidden" name="user_id" value="{{ editing_user.id }}">
+            {% endif %}
+            <div class="admin-form__grid admin-form__grid--compact">
+                <div class="admin-field">
+                    <label for="{{ user_form.username.id_for_label }}">{{ user_form.username.label }}</label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}
+                    <div class="admin-field__error">{{ user_form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ user_form.email.id_for_label }}">{{ user_form.email.label }}</label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}
+                    <div class="admin-field__error">{{ user_form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ user_form.first_name.id_for_label }}">{{ user_form.first_name.label }}</label>
+                    {{ user_form.first_name }}
+                    {% if user_form.first_name.errors %}
+                    <div class="admin-field__error">{{ user_form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ user_form.last_name.id_for_label }}">{{ user_form.last_name.label }}</label>
+                    {{ user_form.last_name }}
+                    {% if user_form.last_name.errors %}
+                    <div class="admin-field__error">{{ user_form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field">
+                    <label for="{{ user_form.role.id_for_label }}">{{ user_form.role.label }}</label>
+                    {{ user_form.role }}
+                    {% if user_form.role.errors %}
+                    <div class="admin-field__error">{{ user_form.role.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field admin-field--inline admin-field--checkbox">
+                    <label for="{{ user_form.is_active.id_for_label }}">{{ user_form.is_active.label }}</label>
+                    <div class="admin-checkbox">
+                        {{ user_form.is_active }}
+                        <span class="admin-checkbox__label">Usuario habilitado</span>
+                    </div>
+                    {% if user_form.is_active.errors %}
+                    <div class="admin-field__error">{{ user_form.is_active.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="admin-field admin-field--full">
+                    <label for="{{ user_form.password.id_for_label }}">{{ user_form.password.label }}</label>
+                    {{ user_form.password }}
+                    {% if user_form.password.help_text %}
+                    <p class="admin-field__hint">{{ user_form.password.help_text }}</p>
+                    {% endif %}
+                    {% if user_form.password.errors %}
+                    <div class="admin-field__error">{{ user_form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="admin-form__actions">
+                <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:configuration' %}?tab=users">Limpiar</a>
+                <button class="admin-button" type="submit">Guardar usuario</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-section">
+        <header class="admin-section__header">
+            <div>
+                <h2>Usuarios registrados</h2>
+                <p>Control rápido de roles, estado y acciones disponibles.</p>
+            </div>
+        </header>
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Último acceso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in user_list %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.get_full_name|default:user.username }}</td>
+                        <td>{{ user.get_role_display }}</td>
+                        <td>
+                            {% if user.is_active %}
+                            <span class="admin-chip">Activo</span>
+                            {% else %}
+                            <span class="admin-chip admin-chip--muted">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>{% if user.last_login %}{{ user.last_login|date:"d/m/Y H:i" }}{% else %}Nunca{% endif %}</td>
+                        <td class="admin-table__actions">
+                            <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:configuration' %}?tab=users&user={{ user.id }}">
+                                <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                                <span>Editar</span>
+                            </a>
+                            {% if not user.is_superuser %}
+                            <form method="post" class="admin-inline-form" onsubmit="return confirm('¿Eliminar usuario {{ user.username }}?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="users">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                <button class="admin-button admin-button--danger" type="submit">
+                                    <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+                                    <span>Eliminar</span>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">No hay usuarios registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="{% static 'raffle/js/admin_configuration.js' %}"></script>
+{% endblock extra_scripts %}

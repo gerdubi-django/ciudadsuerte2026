@@ -1,0 +1,173 @@
+{% extends "raffle/admin_base.html" %}
+{% load static raffle_extras %}
+
+{% block page_title %}Cupones y reportes | Ciudad de la Suerte{% endblock page_title %}
+{% block nav_coupons_active %}is-active{% endblock nav_coupons_active %}
+{% block header_title %}Listados y reportes{% endblock header_title %}
+{% block header_subtitle %}Filtre, analice y administre cupones generados en todas las salas.{% endblock header_subtitle %}
+
+{% block topbar_actions %}
+<a class="admin-button" href="{% url 'raffle_admin:dashboard' %}">Volver al dashboard</a>
+{% endblock topbar_actions %}
+
+{% block content %}
+<section class="admin-section admin-section--primary">
+    <header class="admin-section__header">
+        <div>
+            <h2>Listados y reportes</h2>
+            <p>Combine criterios avanzados para segmentar cupones y emitir impresiones puntuales.</p>
+        </div>
+        <button class="admin-button admin-button--ghost" type="button" data-reset-filters>Limpiar filtros</button>
+    </header>
+    <form class="admin-filter-toolbar" method="get" id="couponFilters">
+        <div class="admin-field">
+            <label for="filterRoom">Sala</label>
+            <select name="room" id="filterRoom" class="admin-select">
+                <option value="">Todas las salas</option>
+                {% for room_id, room_name in rooms %}
+                <option value="{{ room_id }}" {% if room_id == selected_room %}selected{% endif %}>{{ room_name|room_display_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-field">
+            <label for="filterTerminal">Terminal</label>
+            <select name="terminal" id="filterTerminal" class="admin-select">
+                <option value="">Todos los terminales</option>
+                {% for terminal in terminals %}
+                <option value="{{ terminal }}" {% if terminal == selected_terminal %}selected{% endif %}>{{ terminal }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-field">
+            <label for="filterParticipant">Participante</label>
+            <input class="admin-input" id="filterParticipant" name="participant" type="text" placeholder="Nombre o DNI" value="{{ selected_participant }}">
+        </div>
+        <div class="admin-field">
+            <label for="filterCoupon">Código o teléfono</label>
+            <input class="admin-input" id="filterCoupon" name="coupon" type="text" placeholder="Código, teléfono o email" value="{{ selected_coupon }}">
+        </div>
+        <div class="admin-field">
+            <label for="filterSource">Tipo de cupón</label>
+            <select class="admin-select" id="filterSource" name="source">
+                <option value="">Todos</option>
+                {% for source_value, source_label in source_choices %}
+                <option value="{{ source_value }}" {% if source_value == selected_source %}selected{% endif %}>{{ source_label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="admin-field">
+            <label for="filterDateStart">Fecha desde</label>
+            <input class="admin-input" id="filterDateStart" name="date_start" type="date" value="{{ date_start }}">
+        </div>
+        <div class="admin-field">
+            <label for="filterDateEnd">Fecha hasta</label>
+            <input class="admin-input" id="filterDateEnd" name="date_end" type="date" value="{{ date_end }}">
+        </div>
+        <div class="admin-filter-toolbar__actions">
+            <button class="admin-button" type="submit">Aplicar filtros</button>
+        </div>
+    </form>
+    <p class="admin-inline-feedback" data-coupon-feedback hidden></p>
+</section>
+
+<section class="admin-section" id="listados">
+    <header class="admin-section__header">
+        <div>
+            <h2>Listado de cupones</h2>
+            <p>Resultados en tiempo real según los filtros seleccionados.</p>
+        </div>
+        <div class="admin-section__actions">
+            <span class="admin-chip" data-coupon-count>{{ coupon_count }} resultados</span>
+            <span class="admin-chip">Página {{ current_page }} de {{ total_pages }}</span>
+            {% url 'raffle_admin:coupons_export' as export_base %}
+            <div class="admin-button-group">
+                <a class="admin-button admin-button--ghost" href="{{ export_base }}?{{ export_query }}{% if export_query %}&{% endif %}export=all">Todos los cupones</a>
+                <a class="admin-button admin-button--ghost" href="{{ export_base }}?{{ export_query }}{% if export_query %}&{% endif %}export=room">Por sala</a>
+                <a class="admin-button admin-button--ghost" href="{{ export_base }}?{{ export_query }}{% if export_query %}&{% endif %}export=day">Por día</a>
+            </div>
+        </div>
+    </header>
+    <div class="admin-table-wrapper">
+        <table class="admin-table" data-coupon-table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Participante</th>
+                    <th>DNI</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Sala</th>
+                    <th>Terminal</th>
+                    <th>Origen</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr data-coupon-id="{{ coupon.id }}" data-code="{{ coupon.code }}" data-participant="{{ coupon.person.first_name }} {{ coupon.person.last_name }}" data-dni="{{ coupon.person.id_number }}" data-phone="{{ coupon.person.phone }}" data-email="{{ coupon.person.email }}" data-room="{{ coupon.room_name|room_display_name }}" data-terminal="{{ coupon.terminal_name }}" data-source="{{ coupon.get_source_display }}" data-date="{{ coupon.scanned_at|date:'Y-m-d' }}" data-date-display="{{ coupon.scanned_at|date:'d/m/Y H:i' }}">
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.person.first_name }} {{ coupon.person.last_name }}</td>
+                    <td>{{ coupon.person.id_number }}</td>
+                    <td>{{ coupon.person.email }}</td>
+                    <td>{{ coupon.person.phone }}</td>
+                    <td>{{ coupon.room_name|room_display_name }}</td>
+                    <td>{{ coupon.terminal_name|default:"-" }}</td>
+                    <td>{{ coupon.get_source_display }}</td>
+                    <td>{{ coupon.scanned_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <button class="admin-button admin-button--ghost" type="button" data-print-coupon data-print-url="{% url 'raffle_admin:print_coupon' coupon.id %}">
+                            <span class="material-symbols-rounded" aria-hidden="true">print</span>
+                            <span>Imprimir</span>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9">No se encontraron cupones para los filtros seleccionados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if paginator.num_pages > 1 %}
+    <div class="admin-pagination">
+        {% if page_obj.has_previous %}
+        <a class="admin-button admin-button--ghost" href="?{{ pagination_query }}page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% else %}
+        <span class="admin-button admin-button--ghost" aria-disabled="true">Anterior</span>
+        {% endif %}
+        <span class="admin-chip">Página {{ current_page }} de {{ total_pages }}</span>
+        {% if page_obj.has_next %}
+        <a class="admin-button" href="?{{ pagination_query }}page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% else %}
+        <span class="admin-button" aria-disabled="true">Siguiente</span>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<section class="admin-section" id="reportes">
+    <header class="admin-section__header">
+        <div>
+            <h2>Reportes por sala</h2>
+            <p>Resumen consolidado de cupones emitidos agrupados por sala.</p>
+        </div>
+    </header>
+    <div class="admin-metric-grid">
+        {% for item in room_summary %}
+        <article class="admin-metric">
+            <span class="admin-metric__label">{{ item.room.name|room_display_name }}</span>
+            <strong class="admin-metric__value">{{ item.total }}</strong>
+            <span class="admin-metric__hint">Cupones generados en la sala</span>
+        </article>
+        {% empty %}
+        <p class="admin-empty">Todavía no hay cupones generados.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="{% static 'raffle/js/admin_coupons.js' %}"></script>
+{% endblock extra_scripts %}

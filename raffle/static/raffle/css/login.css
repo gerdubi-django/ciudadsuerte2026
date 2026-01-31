@@ -1,0 +1,92 @@
+/* CONTENEDOR DEL FORMULARIO DE LOGIN */
+.form-box {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* FORMULARIO INTERNO */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* separa campos entre sí */
+}
+
+/* TÍTULO Y SUBTÍTULO */
+.content-title {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 2px;
+}
+
+.content-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    line-height: 1.35;
+    margin-top: -4px;
+    margin-bottom: 10px;
+}
+
+/* CAMPOS */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 1vh;
+}
+
+.form-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.85);
+}
+
+/* INPUTS DEL LOGIN (mismo ancho entre ellos) */
+.form-field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px 18px;
+    font-size: var(--fs-base);
+    border-radius: 18px;
+    border: none;
+    background: #eef3ff;
+    color: #000;
+}
+
+/* BOTÓN DE INGRESAR: MISMO ANCHO QUE LOS INPUTS */
+.login-form .button {
+    width: 100%;
+    max-width: 100%;      /* anulamos el 480px global */
+    box-sizing: border-box;
+    margin-top: 6px;      /* separación del último input */
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: var(--accent);
+    color: #000;
+    font-size: var(--fs-base);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.button-login {
+    margin-top: 2vh!important;
+}
+
+/* hover suave */
+.login-form .button:hover {
+    filter: brightness(1.08);
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+    .form-box {
+        max-width: 100%;
+        gap: 20px;
+    }
+}

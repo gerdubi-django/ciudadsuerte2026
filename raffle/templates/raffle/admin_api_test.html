@@ -1,0 +1,57 @@
+{% extends "raffle/admin_base.html" %}
+{% load static %}
+
+{% block nav_dashboard_active %}{% endblock nav_dashboard_active %}
+{% block nav_api_test_active %}is-active{% endblock nav_api_test_active %}
+
+{% block page_title %}Prueba de API | Ciudad de la Suerte{% endblock page_title %}
+{% block header_title %}Prueba de API de sala{% endblock header_title %}
+{% block header_subtitle %}Valide vouchers contra el endpoint de la sala seleccionada.{% endblock header_subtitle %}
+
+{% block content %}
+<section class="admin-section">
+    <article class="admin-panel">
+        <header class="admin-panel__header">
+            <div>
+                <h2 class="admin-panel__title">Ejecutar prueba</h2>
+                <p class="admin-panel__subtitle">Ingrese un voucher y seleccione la sala para verificar la API.</p>
+            </div>
+        </header>
+
+        <form class="admin-form" method="post" novalidate>
+            {% csrf_token %}
+            <div class="admin-grid admin-grid--two">
+                <label class="admin-field">
+                    <span class="admin-field__label">Voucher</span>
+                    {{ form.voucher_code }}
+                    {% if form.voucher_code.errors %}
+                        <span class="admin-field__error">{{ form.voucher_code.errors.0 }}</span>
+                    {% endif %}
+                </label>
+                <label class="admin-field">
+                    <span class="admin-field__label">Sala</span>
+                    {{ form.room_id }}
+                    {% if form.room_id.errors %}
+                        <span class="admin-field__error">{{ form.room_id.errors.0 }}</span>
+                    {% endif %}
+                </label>
+            </div>
+
+            {% if validation_result %}
+            <div class="admin-alert {% if validation_result.is_valid %}admin-alert--success{% else %}admin-alert--error{% endif %}">
+                <span class="material-symbols-rounded" aria-hidden="true">{% if validation_result.is_valid %}check_circle{% else %}error{% endif %}</span>
+                <div>
+                    <p class="admin-alert__title">Resultado de la API</p>
+                    <p class="admin-alert__description">{{ validation_result.message }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="admin-form__actions">
+                <a class="admin-button admin-button--ghost" href="{% url 'raffle_admin:dashboard' %}">Volver</a>
+                <button type="submit" class="admin-button">Probar API</button>
+            </div>
+        </form>
+    </article>
+</section>
+{% endblock content %}
