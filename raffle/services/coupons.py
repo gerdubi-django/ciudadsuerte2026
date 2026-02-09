@@ -64,6 +64,8 @@ def create_coupons(
     terminal_name: str | None = None,
     system_settings: SystemSettings | None = None,
     created_by_user: bool = False,
+    created_by=None,
+    printed: bool = True,
 ) -> List[Coupon]:
     """Create the desired amount of coupons for a person."""
 
@@ -86,6 +88,8 @@ def create_coupons(
             created_by_user=entry_flag,
             room_id=active_room_id,
             terminal_name=terminal_label,
+            created_by=created_by,
+            printed=printed,
         )
         coupons.append(coupon)
     return coupons
