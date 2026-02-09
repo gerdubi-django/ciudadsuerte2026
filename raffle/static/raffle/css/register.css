@@ -87,8 +87,9 @@
     color: rgba(255, 255, 255, 0.85);
     font-size: 0.95rem;
     line-height: 1.5;
-    max-height: 200px;
+    max-height: calc(1.5em * 3);
     overflow-y: auto;
+    white-space: pre-wrap;
 }
 
 .terms-legend::-webkit-scrollbar {

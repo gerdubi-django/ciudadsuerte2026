@@ -29,6 +29,7 @@ from ..forms import (
     LocalPrinterConfigForm,
     PrinterConfigurationForm,
     RoomForm,
+    CashierRegistrationForm,
     RegistrationForm,
     SystemSettingsForm,
     TerminalConfigForm,
@@ -64,8 +65,9 @@ from ..services import (
     validate_entry_rules,
 )
 from ..utils.terminal import get_terminal_config, save_terminal_config
+from ..utils.terms import get_terms_text, save_terms_config
 from utils.printers import pyusb_available
-from .auth import admin_required, staff_required, user_is_administrator
+from .auth import admin_required, cashier_required, staff_required, user_is_administrator
 
 
 UserModel = get_user_model()
@@ -379,6 +381,7 @@ def room_dashboard(request):
             "coupons": coupons,
             "room": room,
             "system_settings": system_settings,
+            "terms_text": get_terms_text(system_settings.terms_text),
             "can_reprint": request.user.has_reprint_access,
         },
         system_settings=system_settings,
@@ -432,12 +435,64 @@ def staff_register(request):
             "form": form,
             "person": person,
             "system_settings": system_settings,
+            "terms_text": get_terms_text(system_settings.terms_text),
         },
         system_settings=system_settings,
         user=request.user,
     )
 
     return render(request, "raffle/staff_register.html", context)
+
+
+@cashier_required
+def cashier_register(request):
+    system_settings, _ = get_or_create_system_settings()
+    active_room_id = _get_active_room_id(request, system_settings)
+    form = CashierRegistrationForm(
+        request.POST or None, initial={"room_id": active_room_id}
+    )
+
+    if request.method == "POST" and form.is_valid():
+        person_data = form.cleaned_data.copy()
+        room_id = _get_active_room_id(request, system_settings)
+        person_data.pop("room_id", None)
+        try:
+            with transaction.atomic():
+                person = Person.objects.create(
+                    email="",
+                    phone="NO INFORMADO",
+                    **person_data,
+                )
+                coupons = create_coupons(
+                    person=person,
+                    quantity=5,
+                    source=Coupon.REGISTER,
+                    room_id=room_id,
+                    terminal_name=_get_terminal_label(system_settings),
+                    system_settings=system_settings,
+                )
+        except IntegrityError:
+            if Person.objects.filter(id_number=person_data["id_number"]).exists():
+                form.add_error("id_number", "Ya existe un participante con ese DNI.")
+            else:
+                form.add_error(None, "No se pudo completar el registro.")
+        else:
+            for coupon in coupons:
+                print_coupon_backend(coupon)
+            messages.success(request, "Participante registrado y cupones emitidos.")
+            return redirect(reverse("raffle_admin:cashier_register"))
+
+    context = _admin_context(
+        {
+            "form": form,
+            "system_settings": system_settings,
+            "terms_text": get_terms_text(system_settings.terms_text),
+        },
+        system_settings=system_settings,
+        user=request.user,
+    )
+
+    return render(request, "raffle/cashier_register.html", context)
 
 
 # -----------------------------------------------------------------------------
@@ -511,6 +566,7 @@ def staff_entry(request):
             "form": form,
             "person": person,
             "system_settings": system_settings,
+            "terms_text": get_terms_text(system_settings.terms_text),
         },
         system_settings=system_settings,
         user=request.user,
@@ -559,6 +615,7 @@ def manual_entry(request):
             "form": form,
             "person": person,
             "system_settings": system_settings,
+            "terms_text": get_terms_text(system_settings.terms_text),
         },
         system_settings=system_settings,
         user=request.user,
@@ -945,7 +1002,8 @@ def admin_configuration(request):
             active_tab = "printers"
 
     configuration_form = PrinterConfigurationForm(request.POST or None, instance=configuration)
-    settings_form = SystemSettingsForm(request.POST or None, instance=system_settings)
+    initial_settings = {"terms_text": get_terms_text(system_settings.terms_text)}
+    settings_form = SystemSettingsForm(request.POST or None, instance=system_settings, initial=initial_settings)
     room_formset_class = modelformset_factory(Room, form=RoomForm, extra=1, can_delete=False)
     room_queryset = Room.objects.order_by("id")
     room_formset = room_formset_class(
@@ -1001,6 +1059,7 @@ def admin_configuration(request):
             return redirect(f"{reverse('raffle_admin:configuration')}?tab=printers")
 
         if active_tab == "system" and settings_form.is_valid():
+            save_terms_config(settings_form.cleaned_data.get("terms_text", ""))
             settings_form.save()
             messages.success(request, "Preferencias del sistema actualizadas.")
             return redirect(f"{reverse('raffle_admin:configuration')}?tab=system")

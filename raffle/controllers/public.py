@@ -14,6 +14,7 @@ from ..services import (
     validate_voucher_code,
 )
 from ..utils.terminal import get_terminal_config
+from ..utils.terms import get_terms_text
 
 
 def home(request):
@@ -58,7 +59,7 @@ def register(request):
     return render(
         request,
         "raffle/register.html",
-        {"form": form, "person": person, "system_settings": system_settings},
+        {"form": form, "person": person, "system_settings": system_settings, "terms_text": get_terms_text(system_settings.terms_text)},
     )
 
 

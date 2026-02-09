@@ -955,3 +955,11 @@ body.admin-body {
         padding-right: 6px;
     }
 }
+
+.admin-terms-preview {
+    margin: 0;
+    line-height: 1.5;
+    max-height: calc(1.5em * 3);
+    overflow-y: auto;
+    white-space: pre-wrap;
+}

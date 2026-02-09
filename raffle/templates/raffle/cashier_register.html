@@ -2,16 +2,16 @@
 {% load static %}
 
 {% block page_title %}Registrar participante | Ciudad de la Suerte{% endblock page_title %}
-{% block nav_register_active %}is-active{% endblock nav_register_active %}
+{% block nav_cashier_register_active %}is-active{% endblock nav_cashier_register_active %}
 {% block header_title %}Registrar participante{% endblock header_title %}
-{% block header_subtitle %}Alta rápida de nuevos jugadores desde el panel de sala.{% endblock header_subtitle %}
+{% block header_subtitle %}Alta simplificada para rol cambista.{% endblock header_subtitle %}
 
 {% block content %}
 <section class="admin-section admin-section--primary">
     <header class="admin-section__header">
         <div>
-            <h2>Datos del participante</h2>
-            <p>Complete los campos obligatorios para emitir cupones de bienvenida.</p>
+            <h2>Datos básicos del participante</h2>
+            <p>Complete solo los datos necesarios para emitir cupones.</p>
         </div>
         <div class="admin-chip-group">
             <span class="admin-chip">Se generan 5 cupones por registro</span>
@@ -46,20 +46,6 @@
                 {% endif %}
             </div>
             <div class="admin-field">
-                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                <div class="admin-field__error">{{ form.email.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="admin-field">
-                <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-                {{ form.phone }}
-                {% if form.phone.errors %}
-                <div class="admin-field__error">{{ form.phone.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="admin-field">
                 <label for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
                 {{ form.birth_date }}
                 {% if form.birth_date.errors %}
@@ -69,7 +55,7 @@
         </div>
         <div class="admin-panel admin-panel--muted">
             <h3 class="admin-panel__title">Aviso al participante</h3>
-            <p class="admin-panel__subtitle">Este texto se imprime junto al cupón de registro.</p>
+            <p class="admin-panel__subtitle">Texto cargado desde ajustes del sistema.</p>
             <p class="admin-terms-preview">{{ terms_text }}</p>
         </div>
         <div class="admin-form__actions">
