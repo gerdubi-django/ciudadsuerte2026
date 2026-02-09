@@ -418,6 +418,8 @@ def staff_register(request):
                     room_id=room_id,
                     terminal_name=_get_terminal_label(system_settings),
                     system_settings=system_settings,
+                    created_by=request.user,
+                    printed=False,
                 )
         except IntegrityError:
             if Person.objects.filter(id_number=person_data["id_number"]).exists():
@@ -634,7 +636,8 @@ def manual_list(request):
         return redirect("raffle_admin:room_dashboard")
 
     selected_room_id = _get_active_room_id(request, system_settings)
-    is_manager_view = request.user.is_floor_manager or request.user.is_admin()
+    is_admin_view = request.user.is_admin()
+    is_manager_view = request.user.is_floor_manager
     room_form = None
 
     if is_manager_view:
@@ -654,20 +657,36 @@ def manual_list(request):
     pending_qs = (
         Coupon.objects.select_related("person", "created_by")
         .filter(
-            source=Coupon.MANUAL,
+            source__in=(Coupon.MANUAL, Coupon.REGISTER),
             printed=False,
-            room_id=selected_room_id,
         )
         .order_by("scanned_at")
     )
 
-    if is_manager_view:
+    if is_admin_view:
+        pass
+    elif is_manager_view:
+        pending_qs = pending_qs.filter(room_id=selected_room_id)
         pending_qs = pending_qs.filter(created_by__role=UserModel.Role.CASHIER)
     else:
+        pending_qs = pending_qs.filter(room_id=selected_room_id)
         pending_qs = pending_qs.filter(created_by=request.user)
 
     cashier_summary = []
-    if is_manager_view:
+    room_summary = []
+    room_creator_summary = []
+    if is_admin_view:
+        room_summary = (
+            pending_qs.values("room_id")
+            .annotate(total=Count("id"))
+            .order_by("room_id")
+        )
+        room_creator_summary = (
+            pending_qs.values("room_id", "created_by__id", "created_by__username")
+            .annotate(total=Count("id"))
+            .order_by("room_id", "created_by__username")
+        )
+    elif is_manager_view:
         cashier_summary = (
             pending_qs.values("created_by__id", "created_by__username")
             .annotate(total=Count("id"))
@@ -675,9 +694,21 @@ def manual_list(request):
         )
 
     if request.method == "POST":
+        print_scope = request.POST.get("print_scope", "all")
+        target_room_id = request.POST.get("target_room_id")
+        target_user_id = request.POST.get("target_user_id")
+        printable_qs = pending_qs
+
+        if is_admin_view and print_scope == "room" and str(target_room_id).isdigit():
+            printable_qs = printable_qs.filter(room_id=int(target_room_id))
+        if is_admin_view and print_scope == "creator" and str(target_user_id).isdigit():
+            printable_qs = printable_qs.filter(created_by_id=int(target_user_id))
+            if str(target_room_id).isdigit():
+                printable_qs = printable_qs.filter(room_id=int(target_room_id))
+
         try:
             with transaction.atomic():
-                coupon_ids = list(pending_qs.values_list("id", flat=True))
+                coupon_ids = list(printable_qs.values_list("id", flat=True))
                 coupons = list(
                     Coupon.objects.select_for_update()
                     .select_related("person")
@@ -700,9 +731,12 @@ def manual_list(request):
         {
             "coupons": pending_qs,
             "cashier_summary": cashier_summary,
+            "room_summary": room_summary,
+            "room_creator_summary": room_creator_summary,
             "room_form": room_form,
             "active_room_id": selected_room_id,
             "is_manager_view": is_manager_view,
+            "is_admin_view": is_admin_view,
             "system_settings": system_settings,
         },
         system_settings=system_settings,
