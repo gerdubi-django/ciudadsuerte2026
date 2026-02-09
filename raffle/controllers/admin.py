@@ -472,8 +472,6 @@ def cashier_register(request):
                     room_id=room_id,
                     terminal_name=_get_terminal_label(system_settings),
                     system_settings=system_settings,
-                    created_by=request.user,
-                    printed=False,
                 )
         except IntegrityError:
             if Person.objects.filter(id_number=person_data["id_number"]).exists():
