@@ -105,6 +105,10 @@
                 {% if active_user and active_user.is_authenticated and active_user.is_cashier_only %}
                 <div class="admin-sidebar__section">
                     <span class="admin-sidebar__section-label">Cuenta</span>
+                    <a class="admin-sidebar__link {% block nav_cashier_register_active %}{% endblock nav_cashier_register_active %}" href="{% url 'raffle_admin:cashier_register' %}">
+                        <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                        <span>Registrar participante</span>
+                    </a>
                     <a class="admin-sidebar__link {% block nav_password_change_active %}{% endblock nav_password_change_active %}" href="{% url 'raffle_admin:password_change' %}">
                         <span class="material-symbols-rounded" aria-hidden="true">key</span>
                         <span>Cambiar contraseña</span>

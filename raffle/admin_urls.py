@@ -13,6 +13,7 @@ urlpatterns = [
     path("sala/", views.room_dashboard, name="room_dashboard"),
     path("ingreso/", views.staff_entry, name="staff_entry"),
     path("registrar/", views.staff_register, name="staff_register"),
+    path("cambista/registrar/", views.cashier_register, name="cashier_register"),
     path("ingreso-manual/", views.manual_entry, name="manual_entry"),
     path("ingreso-manual/listado/", views.manual_list, name="manual_list"),
     path("coupons/", views.admin_coupons, name="coupons"),
