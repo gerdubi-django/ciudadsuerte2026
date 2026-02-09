@@ -446,7 +446,7 @@ def staff_register(request):
     return render(request, "raffle/staff_register.html", context)
 
 
-@cashier_required
+@staff_required
 def cashier_register(request):
     system_settings, _ = get_or_create_system_settings()
     active_room_id = _get_active_room_id(request, system_settings)
@@ -678,22 +678,65 @@ def manual_list(request):
     room_summary = []
     room_creator_summary = []
     if is_admin_view:
-        room_summary = (
+        room_summary_queryset = (
             pending_qs.values("room_id")
             .annotate(total=Count("id"))
             .order_by("room_id")
         )
-        room_creator_summary = (
-            pending_qs.values("room_id", "created_by__id", "created_by__username")
+        room_summary = [
+            {
+                **item,
+                "room_name": RoomDirectory.get(item["room_id"]).name,
+            }
+            for item in room_summary_queryset
+        ]
+        room_creator_summary_queryset = (
+            pending_qs.values(
+                "room_id",
+                "created_by__id",
+                "created_by__username",
+                "created_by__first_name",
+                "created_by__last_name",
+            )
             .annotate(total=Count("id"))
-            .order_by("room_id", "created_by__username")
+            .order_by("room_id", "created_by__first_name", "created_by__username")
         )
+        room_creator_summary = [
+            {
+                **item,
+                "room_name": RoomDirectory.get(item["room_id"]).name,
+                "creator_name": (
+                    f"{item.get('created_by__first_name', '').strip()} "
+                    f"{item.get('created_by__last_name', '').strip()}"
+                ).strip()
+                or item.get("created_by__username")
+                or "Sin asignar",
+            }
+            for item in room_creator_summary_queryset
+        ]
     elif is_manager_view:
-        cashier_summary = (
-            pending_qs.values("created_by__id", "created_by__username")
+        cashier_summary_queryset = (
+            pending_qs.values(
+                "created_by__id",
+                "created_by__username",
+                "created_by__first_name",
+                "created_by__last_name",
+            )
             .annotate(total=Count("id"))
-            .order_by("created_by__username")
+            .order_by("created_by__first_name", "created_by__username")
         )
+        cashier_summary = [
+            {
+                **item,
+                "creator_name": (
+                    f"{item.get('created_by__first_name', '').strip()} "
+                    f"{item.get('created_by__last_name', '').strip()}"
+                ).strip()
+                or item.get("created_by__username")
+                or "Sin asignar",
+            }
+            for item in cashier_summary_queryset
+        ]
 
     if request.method == "POST":
         print_scope = request.POST.get("print_scope", "all")
