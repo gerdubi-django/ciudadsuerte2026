@@ -472,6 +472,8 @@ def cashier_register(request):
                     room_id=room_id,
                     terminal_name=_get_terminal_label(system_settings),
                     system_settings=system_settings,
+                    created_by=request.user,
+                    printed=False,
                 )
         except IntegrityError:
             if Person.objects.filter(id_number=person_data["id_number"]).exists():
@@ -479,9 +481,10 @@ def cashier_register(request):
             else:
                 form.add_error(None, "No se pudo completar el registro.")
         else:
-            for coupon in coupons:
-                print_coupon_backend(coupon)
-            messages.success(request, "Participante registrado y cupones emitidos.")
+            messages.success(
+                request,
+                "Participante registrado. Imprima los cupones pendientes desde el listado.",
+            )
             return redirect(reverse("raffle_admin:cashier_register"))
 
     context = _admin_context(
@@ -669,7 +672,6 @@ def manual_list(request):
         pending_qs = pending_qs.filter(room_id=selected_room_id)
         pending_qs = pending_qs.filter(created_by__role=UserModel.Role.CASHIER)
     else:
-        pending_qs = pending_qs.filter(room_id=selected_room_id)
         pending_qs = pending_qs.filter(created_by=request.user)
 
     cashier_summary = []
