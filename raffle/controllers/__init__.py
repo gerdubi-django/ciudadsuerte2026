@@ -11,6 +11,7 @@ from .admin import (
     configure_terminal,
     room_dashboard,
     staff_register,
+    cashier_register,
 )
 from .auth import admin_required, user_is_administrator
 from .public import entry, home, person_lookup, register, validate_entry_voucher
@@ -28,6 +29,7 @@ __all__ = [
     "configure_terminal",
     "room_dashboard",
     "staff_register",
+    "cashier_register",
     "admin_required",
     "entry",
     "home",

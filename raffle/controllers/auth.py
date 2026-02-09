@@ -47,3 +47,18 @@ def staff_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return wrapped_view
+
+
+def cashier_required(view_func):
+    # Ensure the view is accessed only by authenticated cashier users.
+    @wraps(view_func)
+    def wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            login_url = f"{reverse('raffle_admin:login')}?next={request.path}"
+            return redirect(login_url)
+        if not request.user.is_cashier_only:
+            messages.error(request, "Solo los cambistas pueden acceder a esta sección.")
+            return redirect("raffle_admin:room_dashboard")
+        return view_func(request, *args, **kwargs)
+
+    return wrapped_view

@@ -4,7 +4,7 @@
 {% block page_title %}Cupones manuales pendientes | Ciudad de la Suerte{% endblock page_title %}
 {% block nav_manual_list_active %}is-active{% endblock nav_manual_list_active %}
 {% block header_title %}Pendientes de impresión{% endblock header_title %}
-{% block header_subtitle %}Imprime en lote los cupones manuales que generaste.{% endblock header_subtitle %}
+{% block header_subtitle %}Imprime en lote cupones pendientes por usuario y sala según tu rol.{% endblock header_subtitle %}
 
 {% block content %}
 <section class="admin-section">
@@ -12,7 +12,9 @@
         <div>
             <h2>Cupones generados</h2>
             <p>
-                {% if is_manager_view %}
+                {% if is_admin_view %}
+                Supervise e imprima los cupones pendientes de impresión de todas las salas.
+                {% elif is_manager_view %}
                 Supervise los cupones manuales pendientes de todos los cambistas en la sala seleccionada.
                 {% else %}
                 Solo verás los cupones manuales que todavía no se imprimieron.
@@ -34,6 +36,7 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ active_room_id }}">
+                <input type="hidden" name="print_scope" value="all">
                 <button class="admin-button" type="submit" {% if not coupons %}disabled{% endif %}>
                     <span class="material-symbols-rounded" aria-hidden="true">print</span>
                     <span>Imprimir todos</span>
@@ -41,6 +44,43 @@
             </form>
         </div>
     </header>
+
+    {% if is_admin_view and room_summary %}
+    <div class="admin-metric-grid">
+        {% for item in room_summary %}
+        <article class="admin-metric">
+            <span class="admin-metric__label">Sala {{ item.room_id|room_display_name }}</span>
+            <strong class="admin-metric__value">{{ item.total }}</strong>
+            <span class="admin-metric__hint">Pendientes de impresión</span>
+            <form method="post" style="margin-top: 8px;">
+                {% csrf_token %}
+                <input type="hidden" name="print_scope" value="room">
+                <input type="hidden" name="target_room_id" value="{{ item.room_id }}">
+                <button class="admin-button admin-button--ghost" type="submit">Imprimir sala</button>
+            </form>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if is_admin_view and room_creator_summary %}
+    <div class="admin-metric-grid" style="margin-top: 12px;">
+        {% for item in room_creator_summary %}
+        <article class="admin-metric">
+            <span class="admin-metric__label">{{ item.room_id|room_display_name }} · {{ item.created_by__username|default:"Sin asignar" }}</span>
+            <strong class="admin-metric__value">{{ item.total }}</strong>
+            <span class="admin-metric__hint">Pendientes por generador</span>
+            <form method="post" style="margin-top: 8px;">
+                {% csrf_token %}
+                <input type="hidden" name="print_scope" value="creator">
+                <input type="hidden" name="target_room_id" value="{{ item.room_id }}">
+                <input type="hidden" name="target_user_id" value="{{ item.created_by__id }}">
+                <button class="admin-button admin-button--ghost" type="submit">Imprimir usuario</button>
+            </form>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     {% if cashier_summary %}
     <div class="admin-metric-grid">
@@ -60,8 +100,11 @@
                 <tr>
                     <th>Código</th>
                     <th>Participante</th>
-                    {% if is_manager_view %}
+                    {% if is_manager_view or is_admin_view %}
                     <th>Operador</th>
+                    {% endif %}
+                    {% if is_admin_view %}
+                    <th>Sala</th>
                     {% endif %}
                     <th>DNI</th>
                     <th>Fecha</th>
@@ -72,15 +115,18 @@
                 <tr>
                     <td>{{ coupon.code }}</td>
                     <td>{{ coupon.person.first_name }} {{ coupon.person.last_name }}</td>
-                    {% if is_manager_view %}
+                    {% if is_manager_view or is_admin_view %}
                     <td>{{ coupon.created_by.username|default:"-" }}</td>
+                    {% endif %}
+                    {% if is_admin_view %}
+                    <td>{{ coupon.room_id|room_display_name }}</td>
                     {% endif %}
                     <td>{{ coupon.person.id_number }}</td>
                     <td>{{ coupon.scanned_at|date:"d/m/Y H:i" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="{% if is_manager_view %}5{% else %}4{% endif %}">No hay cupones pendientes de impresión.</td>
+                    <td colspan="{% if is_admin_view %}6{% elif is_manager_view %}5{% else %}4{% endif %}">No hay cupones pendientes de impresión.</td>
                 </tr>
                 {% endfor %}
             </tbody>
