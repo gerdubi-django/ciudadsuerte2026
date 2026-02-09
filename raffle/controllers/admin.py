@@ -472,8 +472,6 @@ def cashier_register(request):
                     room_id=room_id,
                     terminal_name=_get_terminal_label(system_settings),
                     system_settings=system_settings,
-                    created_by=request.user,
-                    printed=False,
                 )
         except IntegrityError:
             if Person.objects.filter(id_number=person_data["id_number"]).exists():
@@ -671,7 +669,7 @@ def manual_list(request):
         pending_qs = pending_qs.filter(room_id=selected_room_id)
         pending_qs = pending_qs.filter(created_by__role=UserModel.Role.CASHIER)
     else:
-        # Keep cashier/operator scope on creator only to include their pending coupons across rooms.
+        pending_qs = pending_qs.filter(room_id=selected_room_id)
         pending_qs = pending_qs.filter(created_by=request.user)
 
     cashier_summary = []
