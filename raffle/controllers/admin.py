@@ -774,7 +774,7 @@ def manual_list(request):
 
     context = _admin_context(
         {
-            "coupons": pending_qs,
+            "coupons": pending_qs.order_by("-scanned_at")[:10],
             "cashier_summary": cashier_summary,
             "room_summary": room_summary,
             "room_creator_summary": room_creator_summary,
