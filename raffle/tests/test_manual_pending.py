@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from raffle.models import Coupon, Person
 
@@ -88,6 +89,36 @@ class CashierManualPendingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         coupons = list(response.context["coupons"])
         self.assertEqual({coupon.id for coupon in coupons}, {own_register.id, own_manual.id})
+
+    def test_manual_list_shows_latest_ten_coupons_sorted_desc(self):
+        person = Person.objects.create(
+            first_name="Bulk",
+            last_name="Coupons",
+            id_number="40000999",
+            phone="999",
+            birth_date=date(1990, 1, 1),
+        )
+        base_time = timezone.now()
+        created_ids = []
+
+        for index in range(12):
+            coupon = Coupon.objects.create(
+                person=person,
+                code=f"BULK-{index:03d}",
+                source=Coupon.MANUAL,
+                room_id=1,
+                created_by=self.cashier,
+                printed=False,
+                scanned_at=base_time + timezone.timedelta(minutes=index),
+            )
+            created_ids.append(coupon.id)
+
+        response = self.client.get(reverse("raffle_admin:manual_list"))
+
+        self.assertEqual(response.status_code, 200)
+        coupons = list(response.context["coupons"])
+        self.assertEqual(len(coupons), 10)
+        self.assertEqual([coupon.id for coupon in coupons], list(reversed(created_ids[-10:])))
 
 
 class StaffManualRegisterAccessTests(TestCase):
