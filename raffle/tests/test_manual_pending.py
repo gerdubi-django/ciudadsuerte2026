@@ -88,3 +88,64 @@ class CashierManualPendingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         coupons = list(response.context["coupons"])
         self.assertEqual({coupon.id for coupon in coupons}, {own_register.id, own_manual.id})
+
+
+class StaffManualRegisterAccessTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.admin_user = user_model.objects.create_user(
+            username="admin_one",
+            password="secret",
+            role=user_model.Role.ADMIN,
+        )
+        self.manager_user = user_model.objects.create_user(
+            username="manager_one",
+            password="secret",
+            role=user_model.Role.FLOOR_MANAGER,
+            first_name="Floor",
+            last_name="Manager",
+        )
+
+    def test_admin_can_access_manual_register_screen(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(reverse("raffle_admin:cashier_register"))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_manager_can_access_manual_register_screen(self):
+        self.client.force_login(self.manager_user)
+
+        response = self.client.get(reverse("raffle_admin:cashier_register"))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_manager_summary_uses_full_name(self):
+        cashier = get_user_model().objects.create_user(
+            username="cashier_summary",
+            password="secret",
+            role=get_user_model().Role.CASHIER,
+            first_name="Ana",
+            last_name="Gomez",
+        )
+        person = Person.objects.create(
+            first_name="Client",
+            last_name="One",
+            id_number="49000001",
+            phone="333",
+            birth_date=date(1991, 1, 1),
+        )
+        Coupon.objects.create(
+            person=person,
+            code="SUMMARY-001",
+            source=Coupon.MANUAL,
+            room_id=1,
+            created_by=cashier,
+            printed=False,
+        )
+
+        self.client.force_login(self.manager_user)
+        response = self.client.get(reverse("raffle_admin:manual_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Ana Gomez")

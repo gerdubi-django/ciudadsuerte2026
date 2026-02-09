@@ -7,7 +7,7 @@
 {% block header_subtitle %}Imprime en lote cupones pendientes por usuario y sala según tu rol.{% endblock header_subtitle %}
 
 {% block content %}
-<section class="admin-section">
+<section class="admin-section manual-pending-view">
     <header class="admin-section__header">
         <div>
             <h2>Cupones generados</h2>
@@ -46,13 +46,13 @@
     </header>
 
     {% if is_admin_view and room_summary %}
-    <div class="admin-metric-grid">
+    <div class="admin-metric-grid manual-pending-cards">
         {% for item in room_summary %}
-        <article class="admin-metric">
-            <span class="admin-metric__label">Sala {{ item.room_id|room_display_name }}</span>
+        <article class="admin-metric manual-pending-card">
+            <span class="admin-metric__label">{{ item.room_name|room_display_name }}</span>
             <strong class="admin-metric__value">{{ item.total }}</strong>
             <span class="admin-metric__hint">Pendientes de impresión</span>
-            <form method="post" style="margin-top: 8px;">
+            <form method="post" class="manual-pending-card__form">
                 {% csrf_token %}
                 <input type="hidden" name="print_scope" value="room">
                 <input type="hidden" name="target_room_id" value="{{ item.room_id }}">
@@ -64,13 +64,13 @@
     {% endif %}
 
     {% if is_admin_view and room_creator_summary %}
-    <div class="admin-metric-grid" style="margin-top: 12px;">
+    <div class="admin-metric-grid manual-pending-cards">
         {% for item in room_creator_summary %}
-        <article class="admin-metric">
-            <span class="admin-metric__label">{{ item.room_id|room_display_name }} · {{ item.created_by__username|default:"Sin asignar" }}</span>
+        <article class="admin-metric manual-pending-card">
+            <span class="admin-metric__label">{{ item.room_name|room_display_name }}</span>
             <strong class="admin-metric__value">{{ item.total }}</strong>
-            <span class="admin-metric__hint">Pendientes por generador</span>
-            <form method="post" style="margin-top: 8px;">
+            <span class="admin-metric__hint">{{ item.creator_name }}</span>
+            <form method="post" class="manual-pending-card__form">
                 {% csrf_token %}
                 <input type="hidden" name="print_scope" value="creator">
                 <input type="hidden" name="target_room_id" value="{{ item.room_id }}">
@@ -83,10 +83,10 @@
     {% endif %}
 
     {% if cashier_summary %}
-    <div class="admin-metric-grid">
+    <div class="admin-metric-grid manual-pending-cards">
         {% for item in cashier_summary %}
-        <article class="admin-metric">
-            <span class="admin-metric__label">{{ item.created_by__username|default:"Sin asignar" }}</span>
+        <article class="admin-metric manual-pending-card">
+            <span class="admin-metric__label">{{ item.creator_name }}</span>
             <strong class="admin-metric__value">{{ item.total }}</strong>
             <span class="admin-metric__hint">Pendientes de impresión</span>
         </article>
@@ -116,10 +116,10 @@
                     <td>{{ coupon.code }}</td>
                     <td>{{ coupon.person.first_name }} {{ coupon.person.last_name }}</td>
                     {% if is_manager_view or is_admin_view %}
-                    <td>{{ coupon.created_by.username|default:"-" }}</td>
+                    <td>{{ coupon.created_by.display_name|default:"-" }}</td>
                     {% endif %}
                     {% if is_admin_view %}
-                    <td>{{ coupon.room_id|room_display_name }}</td>
+                    <td>{{ coupon.room_name|room_display_name }}</td>
                     {% endif %}
                     <td>{{ coupon.person.id_number }}</td>
                     <td>{{ coupon.scanned_at|date:"d/m/Y H:i" }}</td>

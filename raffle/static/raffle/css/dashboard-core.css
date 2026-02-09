@@ -963,3 +963,32 @@ body.admin-body {
     overflow-y: auto;
     white-space: pre-wrap;
 }
+
+.manual-pending-view .admin-table-wrapper {
+    margin-top: 18px;
+    border: 1px solid color-mix(in srgb, var(--admin-color-primary) 18%, transparent);
+    box-shadow: var(--admin-shadow-soft);
+}
+
+.manual-pending-cards {
+    margin-top: 14px;
+}
+
+.manual-pending-card {
+    border: 1px solid color-mix(in srgb, var(--admin-color-primary) 22%, transparent);
+    box-shadow: var(--admin-shadow-soft);
+    background: linear-gradient(155deg, color-mix(in srgb, var(--admin-color-primary) 16%, transparent), color-mix(in srgb, var(--admin-color-accent) 25%, transparent));
+}
+
+.manual-pending-card .admin-metric__label {
+    color: var(--admin-color-text);
+    font-weight: 600;
+}
+
+.manual-pending-card .admin-metric__hint {
+    color: color-mix(in srgb, var(--admin-color-text) 80%, var(--admin-color-text-muted));
+}
+
+.manual-pending-card__form {
+    margin-top: 10px;
+}
