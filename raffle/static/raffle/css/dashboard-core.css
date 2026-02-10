@@ -571,8 +571,9 @@ body.admin-body {
 
 .admin-visual-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(20px, 2vw, 32px);
+    align-items: stretch;
 }
 
 .admin-chart-card {
@@ -604,7 +605,6 @@ body.admin-body {
 
 .admin-chart-card header span { color: var(--admin-color-text-muted); font-size: 0.85rem; }
 
-.admin-chart-card--wide { grid-column: span 2; }
 
 .admin-panel__header {
     display: flex;
@@ -884,6 +884,10 @@ body.admin-body {
 
 .admin-empty { color: var(--admin-color-text-muted); font-size: 0.9rem; }
 
+@media (max-width: 1200px) {
+    .admin-visual-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 1024px) {
     .admin-shell { grid-template-columns: 1fr; }
     body.admin-sidebar-open { overflow: hidden; }
@@ -923,7 +927,13 @@ body.admin-body {
         justify-items: stretch;
     }
     .admin-action-grid { grid-template-columns: 1fr; }
-    .admin-chart-card--wide { grid-column: span 1; }
+    .admin-visual-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    .admin-chart-card {
+        width: min(100%, 560px);
+    }
     .admin-chart-card__canvas { height: 320px; }
 }
 
