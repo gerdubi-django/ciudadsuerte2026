@@ -70,14 +70,10 @@
                         <span class="material-symbols-rounded" aria-hidden="true">qr_code_scanner</span>
                         <span>Ingreso</span>
                     </a>
+                    {% endif %}
                     <a class="admin-sidebar__link {% block nav_register_active %}{% endblock nav_register_active %}" href="{% url 'raffle_admin:staff_register' %}">
                         <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
                         <span>Registrar participante</span>
-                    </a>
-                    {% endif %}
-                    <a class="admin-sidebar__link {% block nav_cashier_register_active_cashier_only %}{% endblock nav_cashier_register_active_cashier_only %}" href="{% url 'raffle_admin:cashier_register' %}">
-                        <span class="material-symbols-rounded" aria-hidden="true">app_registration</span>
-                        <span>Registro manual</span>
                     </a>
                 </div>
                 {% endif %}

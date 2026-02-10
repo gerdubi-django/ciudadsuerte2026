@@ -82,23 +82,3 @@ class RegistrationForm(forms.ModelForm):
         if age < 18:
             raise forms.ValidationError("El participante debe ser mayor de 18 años.")
         return birth_date
-
-
-class CashierRegistrationForm(RegistrationForm):
-    class Meta(RegistrationForm.Meta):
-        fields = (
-            "first_name",
-            "last_name",
-            "id_number",
-            "birth_date",
-        )
-
-    def save(self, commit: bool = True):
-        """Persist a participant with simplified fields for cashier-only flow."""
-
-        person = super().save(commit=False)
-        person.email = ""
-        person.phone = "NO INFORMADO"
-        if commit:
-            person.save()
-        return person

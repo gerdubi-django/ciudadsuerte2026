@@ -30,7 +30,6 @@ from ..forms import (
     LocalPrinterConfigForm,
     PrinterConfigurationForm,
     RoomForm,
-    CashierRegistrationForm,
     RegistrationForm,
     SystemSettingsForm,
     TerminalConfigForm,
@@ -472,7 +471,7 @@ def staff_register(request):
 def cashier_register(request):
     system_settings, _ = get_or_create_system_settings()
     active_room_id = _get_active_room_id(request, system_settings)
-    form = CashierRegistrationForm(
+    form = RegistrationForm(
         request.POST or None, initial={"room_id": active_room_id}
     )
 
@@ -482,11 +481,7 @@ def cashier_register(request):
         person_data.pop("room_id", None)
         try:
             with transaction.atomic():
-                person = Person.objects.create(
-                    email="",
-                    phone="NO INFORMADO",
-                    **person_data,
-                )
+                person = Person.objects.create(**person_data)
                 coupons = create_coupons(
                     person=person,
                     quantity=5,
@@ -505,7 +500,7 @@ def cashier_register(request):
         else:
             messages.success(
                 request,
-                "Participante registrado. Imprima los cupones pendientes desde el listado.",
+                "Participante registrado y cupones emitidos.",
             )
             return redirect(reverse("raffle_admin:cashier_register"))
 
