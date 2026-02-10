@@ -6,14 +6,14 @@
 {% block nav_cashier_register_active_cashier_only %}is-active{% endblock nav_cashier_register_active_cashier_only %}
 {% block nav_manual_register_active %}is-active{% endblock nav_manual_register_active %}
 {% block header_title %}Registrar participante{% endblock header_title %}
-{% block header_subtitle %}Alta simplificada para rol cambista.{% endblock header_subtitle %}
+{% block header_subtitle %}Alta de nuevos participantes para emisión inmediata de cupones.{% endblock header_subtitle %}
 
 {% block content %}
 <section class="admin-section admin-section--primary">
     <header class="admin-section__header">
         <div>
-            <h2>Datos básicos del participante</h2>
-            <p>Complete solo los datos necesarios para emitir cupones.</p>
+            <h2>Datos del participante</h2>
+            <p>Complete los campos obligatorios para emitir cupones de bienvenida.</p>
         </div>
         <div class="admin-chip-group">
             <span class="admin-chip">Se generan 5 cupones por registro</span>
@@ -45,6 +45,20 @@
                 {{ form.id_number }}
                 {% if form.id_number.errors %}
                 <div class="admin-field__error">{{ form.id_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="admin-field__error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <div class="admin-field__error">{{ form.phone.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="admin-field">
