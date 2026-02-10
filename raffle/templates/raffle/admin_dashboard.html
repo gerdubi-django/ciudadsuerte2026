@@ -90,7 +90,7 @@
     <header class="admin-section__header">
         <div>
             <h2>Gráficos comparativos</h2>
-            <p>Visualice el desempeño por sala, origen y evolución temporal.</p>
+            <p>Visualice el desempeño por sala, origen, terminales y tendencias diarias.</p>
         </div>
         <button class="admin-button admin-button--ghost" type="button" data-refresh-charts>Actualizar</button>
     </header>
@@ -113,13 +113,40 @@
                 <canvas id="chartSources"></canvas>
             </div>
         </figure>
-        <figure class="admin-chart-card admin-chart-card--wide">
+        <figure class="admin-chart-card">
             <header>
                 <h3>Actividad por fecha</h3>
                 <span>Cupones generados en los últimos días.</span>
             </header>
             <div class="admin-chart-card__canvas">
                 <canvas id="chartTimeline"></canvas>
+            </div>
+        </figure>
+        <figure class="admin-chart-card">
+            <header>
+                <h3>Cupones por terminal</h3>
+                <span>Terminales con más actividad reciente.</span>
+            </header>
+            <div class="admin-chart-card__canvas">
+                <canvas id="chartTerminals"></canvas>
+            </div>
+        </figure>
+        <figure class="admin-chart-card">
+            <header>
+                <h3>Cupones por día de semana</h3>
+                <span>Patrón semanal de generación de cupones.</span>
+            </header>
+            <div class="admin-chart-card__canvas">
+                <canvas id="chartWeekday"></canvas>
+            </div>
+        </figure>
+        <figure class="admin-chart-card">
+            <header>
+                <h3>Cupones vs vouchers quemados</h3>
+                <span>Comparativa diaria entre generación y bloqueos.</span>
+            </header>
+            <div class="admin-chart-card__canvas">
+                <canvas id="chartStatus"></canvas>
             </div>
         </figure>
     </div>

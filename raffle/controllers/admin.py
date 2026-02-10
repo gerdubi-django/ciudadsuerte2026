@@ -310,6 +310,8 @@ def admin_dashboard(request):
         "roomValues": [i["total"] for i in room_summary],
         "sourceLabels": [c.get_source_display() for c in chart_coupons],
         "recentDates": [c.scanned_at.date().isoformat() for c in chart_coupons],
+        "terminalLabels": [c.terminal_name or "Sin terminal" for c in chart_coupons],
+        "burnedRecentDates": [v.scanned_at.date().isoformat() for v in burned_vouchers],
         "totalCoupons": coupon_qs.count(),
         "totalBurned": voucher_qs.count(),
     }
