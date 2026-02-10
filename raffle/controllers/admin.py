@@ -460,11 +460,7 @@ def cashier_register(request):
         person_data.pop("room_id", None)
         try:
             with transaction.atomic():
-                person = Person.objects.create(
-                    email="",
-                    phone="NO INFORMADO",
-                    **person_data,
-                )
+                person = Person.objects.create(**person_data)
                 coupons = create_coupons(
                     person=person,
                     quantity=5,

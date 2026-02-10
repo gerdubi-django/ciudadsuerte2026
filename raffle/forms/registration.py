@@ -90,15 +90,7 @@ class CashierRegistrationForm(RegistrationForm):
             "first_name",
             "last_name",
             "id_number",
+            "email",
+            "phone",
             "birth_date",
         )
-
-    def save(self, commit: bool = True):
-        """Persist a participant with simplified fields for cashier-only flow."""
-
-        person = super().save(commit=False)
-        person.email = ""
-        person.phone = "NO INFORMADO"
-        if commit:
-            person.save()
-        return person

@@ -48,6 +48,20 @@
                 {% endif %}
             </div>
             <div class="admin-field">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="admin-field__error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
+                <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <div class="admin-field__error">{{ form.phone.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="admin-field">
                 <label for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
                 {{ form.birth_date }}
                 {% if form.birth_date.errors %}

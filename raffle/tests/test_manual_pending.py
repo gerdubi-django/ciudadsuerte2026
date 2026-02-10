@@ -29,6 +29,8 @@ class CashierManualPendingTests(TestCase):
             "first_name": "Ana",
             "last_name": "Perez",
             "id_number": "30000001",
+            "email": "ana@example.com",
+            "phone": "5551234",
             "birth_date": "1990-01-01",
             "room_id": "1",
         }
@@ -39,6 +41,8 @@ class CashierManualPendingTests(TestCase):
         self.assertEqual(response.status_code, 302)
         coupons = Coupon.objects.filter(person__id_number="30000001", source=Coupon.REGISTER)
         self.assertEqual(coupons.count(), 5)
+        self.assertEqual(coupons.first().person.email, "ana@example.com")
+        self.assertEqual(coupons.first().person.phone, "5551234")
         self.assertTrue(all(coupon.created_by_id == self.cashier.id for coupon in coupons))
         self.assertTrue(all(not coupon.printed for coupon in coupons))
         print_mock.assert_not_called()
