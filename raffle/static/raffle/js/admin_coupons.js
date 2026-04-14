@@ -39,7 +39,7 @@
                     'Accept': 'application/json'
                 }
             })
-                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(parseJsonResponse)
                 .then(({ ok, data }) => {
                     displayFeedback(data.message || 'Cupón enviado.', !ok);
                     button.textContent = ok ? 'Impreso' : 'Reintentar';
@@ -56,6 +56,15 @@
                         button.disabled = false;
                     }, 1400);
                 });
+        }
+
+        // Parse backend responses safely even when HTML or plain text is returned by an error page.
+        function parseJsonResponse(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return response.json().then(data => ({ ok: response.ok, data }));
+            }
+            return response.text().then(() => ({ ok: false, data: {} }));
         }
 
         // Show helper feedback messages within the listing view.

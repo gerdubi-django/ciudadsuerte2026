@@ -23,7 +23,7 @@
                     'Accept': 'application/json'
                 }
             })
-                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(parseJsonResponse)
                 .then(({ ok, data }) => {
                     displayFeedback(data.message || 'Acción completada.', !ok);
                     if (ok) {
@@ -39,6 +39,15 @@
                     button.textContent = original;
                 });
         });
+
+        // Parse backend responses safely even when HTML or plain text is returned by an error page.
+        function parseJsonResponse(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return response.json().then(data => ({ ok: response.ok, data }));
+            }
+            return response.text().then(() => ({ ok: false, data: {} }));
+        }
 
         if (searchInput) {
             searchInput.addEventListener('input', () => {

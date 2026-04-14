@@ -92,7 +92,7 @@
                         'Accept': 'application/json'
                     }
                 })
-                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                    .then(parseJsonResponse)
                     .then(({ ok, data }) => {
                         if (!ok) {
                             updateUsbStatus('No se pudo completar el escaneo.', true);
@@ -114,6 +114,15 @@
                         usbButton.textContent = 'Buscar dispositivos USB';
                     });
             });
+        }
+
+        // Parse backend responses safely even when HTML or plain text is returned by an error page.
+        function parseJsonResponse(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return response.json().then(data => ({ ok: response.ok, data }));
+            }
+            return response.text().then(() => ({ ok: false, data: {} }));
         }
 
         // Update the USB helper banner status text and tone.
