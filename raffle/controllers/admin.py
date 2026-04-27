@@ -56,7 +56,6 @@ from ..services import (
     build_room_report_workbook,
     create_coupons,
     create_manual_coupon,
-    get_coupon_room_summary,
     get_or_create_printer_configuration,
     get_or_create_system_settings,
     print_coupon_backend,
@@ -64,6 +63,7 @@ from ..services import (
     render_workbook_response,
     validate_entry_rules,
 )
+from ..services.summary import get_coupon_room_summary as build_coupon_room_summary
 from ..utils.terminal import get_terminal_config, save_terminal_config
 from ..utils.terms import get_terms_text, save_terms_config
 from utils.printers import pyusb_available
@@ -71,6 +71,11 @@ from .auth import admin_required, cashier_required, staff_required, user_is_admi
 
 
 UserModel = get_user_model()
+
+
+def _get_coupon_room_summary(queryset):
+    # Keep a local wrapper so admin views never fail if service imports are refactored.
+    return build_coupon_room_summary(queryset)
 
 
 # -----------------------------------------------------------------------------
@@ -286,7 +291,7 @@ def admin_dashboard(request):
         voucher_qs = voucher_qs.filter(scanned_at__lte=dt)
 
     # DATASET
-    room_summary = get_coupon_room_summary(coupon_qs)
+    room_summary = _get_coupon_room_summary(coupon_qs)
 
     reprint_totals = (
         reprint_logs.annotate(total=Count("id")).order_by("-total", "user__username")
@@ -964,7 +969,7 @@ def admin_coupons(request):
     context = _admin_context(
         {
             "coupons": page_obj.object_list,
-            "room_summary": get_coupon_room_summary(coupons),
+            "room_summary": _get_coupon_room_summary(coupons),
             "coupon_count": paginator.count,
             "paginator": paginator,
             "page_obj": page_obj,
